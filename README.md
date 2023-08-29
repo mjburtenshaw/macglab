@@ -7,7 +7,7 @@ This program opens all GitLab Merge Requests in a browser meeting the following 
 - Authored by given users
 - Part of a given group
 
-![Static Badge](https://img.shields.io/badge/version-2.0.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-2.0.1-66023c)
 
 ## Table of contents
 
@@ -21,11 +21,15 @@ Run `macglab` in a shell.
 
 ## Installation
 
+1. Clone this repository, move into it, and run the install script:
+
 ```sh
 git clone https://github.com/mjburtenshaw/macglab.git
 cd macglab
 go run install/install.go
 ```
+
+2. Re-source your shell or open a new terminal to run the `macglab` command!
 
 ## Configuration
 
