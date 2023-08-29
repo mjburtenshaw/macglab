@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/mjburtenshaw/macglab/mrs"
 )
 
 func main() {
-	fmt.Println("Hello World!");
+	mrs.OpenMrs()
 }
