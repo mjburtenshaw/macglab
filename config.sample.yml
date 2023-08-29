@@ -1,0 +1,4 @@
+ACCESS_TOKEN: <your_access_token_here>
+GROUP_ID: <your_group_id_here>
+USERNAMES:
+  - <a_list_of_usernames_here>

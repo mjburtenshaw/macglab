@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -21,7 +22,12 @@ var (
 )
 
 func init() {
-	configFile, err := os.ReadFile("config.yml")
+	configHome := os.Getenv("MACGLAB")
+	if configHome == "" {
+		log.Fatal("💀 Couldn't find MACGLAB environment variable")
+	}
+
+	configFile, err := os.ReadFile(fmt.Sprintf("%s/config.yml", configHome))
 	if err != nil {
 		log.Fatalf("💀 Failed to read config file: %v", err)
 	}
