@@ -15,7 +15,7 @@ import (
 func openURL(url string) error {
 	var cmd string
 	var args []string
-
+	
 	switch runtime.GOOS {
 	case "darwin":
 		cmd = "open"
@@ -27,11 +27,11 @@ func openURL(url string) error {
 		cmd = "xdg-open"
 		args = []string{url}
 	}
-
+	
 	return exec.Command(cmd, args...).Start()
 }
 
-func OpenMrs() {
+func FetchMergeRequests() [] *gitlab.MergeRequest {
 	var mrs [] *gitlab.MergeRequest
 	
 	for _, username := range config.Usernames {
@@ -46,8 +46,17 @@ func OpenMrs() {
 		mrs = append(mrs, userMrs...)
 	}
 	
+	return mrs
+}
+
+func PrintMergeRequests(mrs []*gitlab.MergeRequest) {
 	for _, mr := range mrs {
 		fmt.Printf("@%s: %s\n", mr.Author.Username, mr.WebURL)
+	}
+}
+
+func OpenMergeRequests(mrs []*gitlab.MergeRequest) {
+	for _, mr := range mrs {
 		openURL(mr.WebURL)
 	}
 }
