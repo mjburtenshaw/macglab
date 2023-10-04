@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	fmt.Println("macglab: 🏗️ Installing macglab...")
+	fmt.Println("macglab: 🏗️  Installing macglab...")
 	homeUri := os.Getenv("HOME")
 	if homeUri == "" {
 		log.Fatal("macglab: 🏚️ Couldn't find HOME environment variable.")
@@ -90,7 +90,7 @@ func main() {
 	}
 
 	fmt.Println("macglab: 🎉 Successfully installed!")
-	fmt.Println("macglab: 🐚  Re-source your shell session or open a new terminal, then run `macglab` and watch the magic happen!")
+	fmt.Println("macglab: 🐚 Re-source your shell session or open a new terminal, then run `macglab` and watch the magic happen!")
 
 	if isNewInstall {
 		fmt.Printf("macglab: 📜 Created a new config file at %s. Please open it and define values.\n", macglabConfigUrl)

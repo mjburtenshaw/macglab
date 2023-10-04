@@ -2,12 +2,12 @@
 
 Trying to gather your work on gitlab.com takes too much time. Let's automate that instead.
 
-This program opens all GitLab Merge Requests in a browser meeting the following criteria:
+This program prints all GitLab Merge Requests meeting the following criteria:
 - Open
 - Authored by given users
 - Part of a given group
 
-![Static Badge](https://img.shields.io/badge/version-2.0.1-66023c)
+![Static Badge](https://img.shields.io/badge/version-2.1.1-66023c)
 
 ## Table of contents
 
@@ -17,7 +17,7 @@ This program opens all GitLab Merge Requests in a browser meeting the following 
 
 ## Usage
 
-Run `macglab` in a shell.
+Run `macglab` in a shell. Use the `-browser` flag to open MRs in the browser.
 
 ## Installation
 
