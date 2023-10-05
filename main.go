@@ -3,18 +3,41 @@ package main
 import (
 	"flag"
 
+	"github.com/mjburtenshaw/macglab/config"
 	"github.com/mjburtenshaw/macglab/mrs"
+	"github.com/xanzy/go-gitlab"
 )
 
 func main() {
-	browserFlag := flag.Bool("browser", false, "Open merge requests in the browser")
+	browserFlag := flag.Bool("browser", false, "Open merge requests in the browser.")
+	groupFlag := flag.Bool("group", false, "Filter output to the usernames configuration.")
+	projectsFlag := flag.Bool("projects", false, "Filter output to the projects configuration.")
+
 
 	flag.Parse()
 
-	mergeRequests := mrs.FetchMergeRequests()
-	mrs.PrintMergeRequests(mergeRequests)
+	var allMrs []*gitlab.MergeRequest
+
+	if (!*groupFlag && !*projectsFlag) || *groupFlag {
+		groupMrs := mrs.FetchGroupMergeRequests()
+		allMrs = append(allMrs, groupMrs...)
+	}
+
+	if (!*groupFlag && !*projectsFlag) || *projectsFlag {
+		allUsernames := config.Projects["all"]
+
+		for project, usernames := range config.Projects {
+				if project != "all" {
+						combinedUsernames := append(usernames, allUsernames...)
+						projectMrs := mrs.FetchProjectMergeRequests(project, combinedUsernames)
+						allMrs = append(allMrs, projectMrs...)
+				}
+		}
+	}
+
+	mrs.PrintMergeRequests(allMrs)
 
 	if *browserFlag {
-		mrs.OpenMergeRequests(mergeRequests)
+		mrs.OpenMergeRequests(allMrs)
 	}
 }

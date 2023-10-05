@@ -11,6 +11,7 @@ import (
 type Config struct {
 	AccessToken string   `yaml:"ACCESS_TOKEN"`
 	GroupId     string   `yaml:"GROUP_ID"`
+	Projects    map[string][]string `yaml:"PROJECTS"`
 	Usernames   []string `yaml:"USERNAMES"`
 }
 
@@ -18,6 +19,7 @@ var (
 	config     *Config
 	AccessToken string
 	GroupId     string
+	Projects map[string][]string
 	Usernames   []string
 )
 
@@ -39,5 +41,6 @@ func init() {
 
 	AccessToken = config.AccessToken
 	GroupId = config.GroupId
+	Projects = config.Projects
 	Usernames = config.Usernames
 }
