@@ -1,9 +1,25 @@
 ACCESS_TOKEN: <your_access_token_here>
+
 GROUP_ID: <your_group_id_here>
+
+# usernames listed under the "all" entry will apply to every project listed below.
 PROJECTS:
-  - all:
-    - <a_list_of_usernames_here>
-  - <a_list_of_projects_here>
-    - <a_list_of_usernames_here>
+    all:
+        - username1
+    123:
+        # projectA
+        - username2
+        - username3
+    456:
+        # projectB
+        - username3
+        - username4
+    789:
+        # projectC
+        # if left blank, this will inherit from `all`.
+    101112:
+        # projectD
+        - username4
+
 USERNAMES:
   - <a_list_of_usernames_here>

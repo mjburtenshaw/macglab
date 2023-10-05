@@ -16,6 +16,7 @@ Table of Contents
 - [Usage](#usage)
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [See Also](#see-also)
 
 Usage
 -----
@@ -44,21 +45,38 @@ Configuration
 --------------
 
 Update `config.yml` with:
-- `ACCESS_TOKEN`: [GitLab personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
-- `GROUP_ID`: [GitLab group ID](https://docs.gitlab.com/ee/api/groups.html)
-- `USERNAMES`: List of GitLab usernames in the group you wish to follow.
-- `PROJECTS`: Map of projects and associated usernames you wish to follow. For example:
+- `ACCESS_TOKEN`: A GitLab personal access token[^1].
+- `GROUP_ID`: A GitLab group ID[^2].
+- `USERNAMES`: A list of GitLab usernames in the group you wish to follow.
+- `PROJECTS`: A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
 
 ```yaml
-# usernames listed under the "all" entry will apply to every project listed below
+# usernames listed under the "all" entry will apply to every project listed below.
 
 PROJECTS:
-    - all:
+    all:
         - username1
-    - project1:
+    123:
+        # projectA
         - username2
         - username3
-    - project2:
+    456:
+        # projectB
         - username3
         - username4
+    789:
+        # projectC
+        # if left blank, this will inherit from `all`.
+    101112:
+        # projectD
+        - username4
 ```
+
+See [the sample config](/config.sample.yml) for a full example.
+
+See Also
+---------
+
+[^1]: [GitLab personal access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
+[^2]: [GitLab groups](https://docs.gitlab.com/ee/api/groups.html)
+[^3]: [GitLab project IDs](https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api)
