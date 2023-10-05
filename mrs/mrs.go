@@ -31,8 +31,8 @@ func openURL(url string) error {
 	return exec.Command(cmd, args...).Start()
 }
 
-func FetchMergeRequests() [] *gitlab.MergeRequest {
-	var mrs [] *gitlab.MergeRequest
+func FetchGroupMergeRequests() [] *gitlab.MergeRequest {
+	var groupMrs [] *gitlab.MergeRequest
 	
 	for _, username := range config.Usernames {
 		userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
@@ -43,10 +43,10 @@ func FetchMergeRequests() [] *gitlab.MergeRequest {
 			log.Fatalf("💀 Failed to get merge request for %s: %v", username, err)
 		}
 
-		mrs = append(mrs, userMrs...)
+		groupMrs = append(groupMrs, userMrs...)
 	}
 	
-	return mrs
+	return groupMrs
 }
 
 func PrintMergeRequests(mrs []*gitlab.MergeRequest) {
