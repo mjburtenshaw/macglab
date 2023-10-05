@@ -49,6 +49,24 @@ func FetchGroupMergeRequests() [] *gitlab.MergeRequest {
 	return groupMrs
 }
 
+func FetchProjectMergeRequests(projectId string, usernames []string) [] *gitlab.MergeRequest {
+	var projectMrs [] *gitlab.MergeRequest
+	
+	for _, username := range usernames {
+		userMrs, _, err := glab.Client.MergeRequests.ListProjectMergeRequests(projectId, &gitlab.ListProjectMergeRequestsOptions{
+			State: gitlab.String("opened"),
+			AuthorUsername: gitlab.String(username),
+		})
+		if err != nil {
+			log.Fatalf("💀 Failed to get merge request for %s: %v", username, err)
+		}
+
+		projectMrs = append(projectMrs, userMrs...)
+	}
+	
+	return projectMrs
+}
+
 func PrintMergeRequests(mrs []*gitlab.MergeRequest) {
 	for _, mr := range mrs {
 		fmt.Printf("@%s: %s\n", mr.Author.Username, mr.WebURL)
