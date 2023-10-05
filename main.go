@@ -11,10 +11,10 @@ func main() {
 
 	flag.Parse()
 
-	mergeRequests := mrs.FetchGroupMergeRequests()
-	mrs.PrintMergeRequests(mergeRequests)
+	groupMrs := mrs.FetchGroupMergeRequests()
+	mrs.PrintMergeRequests(groupMrs)
 
 	if *browserFlag {
-		mrs.OpenMergeRequests(mergeRequests)
+		mrs.OpenMergeRequests(groupMrs)
 	}
 }
