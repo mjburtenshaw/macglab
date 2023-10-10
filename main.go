@@ -33,7 +33,10 @@ func main() {
 		for project, usernames := range config.Projects {
 				if project != "all" {
 						combinedUsernames := append(usernames, allUsernames...)
-						projectMrs := mrs.FetchProjectMergeRequests(project, combinedUsernames, draftFlag)
+						projectMrs, err := mrs.FetchProjectMergeRequests(project, combinedUsernames, draftFlag)
+						if err != nil {
+							panic(err)
+						}
 						allMrs = append(allMrs, projectMrs...)
 				}
 		}

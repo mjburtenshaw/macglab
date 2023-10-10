@@ -1,21 +1,26 @@
 package mrs
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
 	"runtime"
 
-	"github.com/xanzy/go-gitlab"
-
 	"github.com/mjburtenshaw/macglab/config"
 	"github.com/mjburtenshaw/macglab/glab"
+	"github.com/xanzy/go-gitlab"
 )
 
+// openURL opens the specified URL in the user's default browser.
 func openURL(url string) error {
+	if url == "" {
+		return errors.New("url cannot be empty")
+	}
+
 	var cmd string
 	var args []string
-	
+
 	switch runtime.GOOS {
 	case "darwin":
 		cmd = "open"
@@ -27,46 +32,21 @@ func openURL(url string) error {
 		cmd = "xdg-open"
 		args = []string{url}
 	}
-	
+
 	return exec.Command(cmd, args...).Start()
 }
 
-// getWip converts a boolean pointer to a string representation used for querying GitLab's
-// Merge Request API with regard to draft (Work In Progress - WIP) status.
-// GitLab currently does not support a `draft` query parameter, instead, it uses `wip` (Work In Progress).
-//
-// The function behaves as follows:
-// - If `shouldIncludeDrafts` is nil or points to `false`, "no" is returned to exclude drafts from results.
-// - If `shouldIncludeDrafts` points to `true`, an empty string is returned, which does not filter results
-//   based on draft status, effectively including drafts in the results.
-//
-// Example:
-//   drafts := true
-//   queryParam := getWip(&drafts)  // queryParam will be ""
-//
-// GitLab Merge Requests API documentation:
-// https://docs.gitlab.com/ee/api/merge_requests.html#list-merge-requests
-//
-// Usage:
-// The returned string is intended to be used as the value for the `wip` query parameter in
-// GitLab's Merge Requests API.
-//
-//   options := &gitlab.ListMergeRequestsOptions{
-//       WIP: gitlab.String(getWip(&drafts)),
-//   }
-//   mergeRequests, _, err := gitlabClient.MergeRequests.ListMergeRequests(projectID, options)
-func getWip(shouldIncludeDrafts *bool) string {
+// getWIPQueryParam converts a boolean pointer to a string representation for querying GitLab's
+// Merge Request API with regard to Work In Progress (WIP) status.
+func getWIPQueryParam(shouldIncludeDrafts *bool) string {
 	wip := "no"
-
 	if shouldIncludeDrafts != nil && *shouldIncludeDrafts {
 		wip = ""
 	}
-
 	return wip
 }
 
 // FetchGroupMergeRequests fetches merge requests for a group from GitLab.
-// It returns a slice of pointers to gitlab.MergeRequest and an error, if any occurs.
 func FetchGroupMergeRequests(shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
 	var groupMrs []*gitlab.MergeRequest
 
@@ -82,48 +62,53 @@ func FetchGroupMergeRequests(shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest,
 }
 
 // fetchUserMergeRequests fetches merge requests for a specific user within a group from GitLab.
-// It returns a slice of pointers to gitlab.MergeRequest and an error, if any occurs.
 func fetchUserMergeRequests(username string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
 	userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
 		AuthorUsername: gitlab.String(username),
 		State:          gitlab.String("opened"),
-		WIP:            gitlab.String(getWip(shouldIncludeDrafts)),
+		WIP:            gitlab.String(getWIPQueryParam(shouldIncludeDrafts)),
 	})
 	if err != nil {
-		log.Printf("💀 Failed to get merge requests for %s: %v\n", username, err)
+		log.Printf("Failed to get merge requests for %s: %v\n", username, err)
 		return nil, err
 	}
 
 	return userMrs, nil
 }
 
-func FetchProjectMergeRequests(projectId string, usernames []string, shouldIncludeDrafts *bool) [] *gitlab.MergeRequest {
-	var projectMrs [] *gitlab.MergeRequest
-	
+// FetchProjectMergeRequests fetches merge requests for a project from GitLab.
+func FetchProjectMergeRequests(projectId string, usernames []string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	var projectMrs []*gitlab.MergeRequest
+
 	for _, username := range usernames {
 		userMrs, _, err := glab.Client.MergeRequests.ListProjectMergeRequests(projectId, &gitlab.ListProjectMergeRequestsOptions{
 			AuthorUsername: gitlab.String(username),
-			State: gitlab.String("opened"),
-			WIP: gitlab.String(getWip(shouldIncludeDrafts)),
+			State:          gitlab.String("opened"),
+			WIP:            gitlab.String(getWIPQueryParam(shouldIncludeDrafts)),
 		})
 		if err != nil {
-			log.Fatalf("💀 Failed to get merge request for %s: %v", username, err)
+			return nil, fmt.Errorf("failed to get merge request for %s: %w", username, err)
 		}
 
 		projectMrs = append(projectMrs, userMrs...)
 	}
-	
-	return projectMrs
+
+	return projectMrs, nil
 }
 
+// PrintMergeRequests prints the details of the merge requests to the console.
 func PrintMergeRequests(mrs []*gitlab.MergeRequest) {
 	for _, mr := range mrs {
 		fmt.Printf("@%s: %s\n", mr.Author.Username, mr.WebURL)
 	}
 }
 
-func OpenMergeRequests(mrs []*gitlab.MergeRequest) {
+// OpenMergeRequests opens the URLs of the merge requests in the user's default browser.
+func OpenMergeRequests(mrs []*gitlab.MergeRequest) error {
 	for _, mr := range mrs {
-		openURL(mr.WebURL)
+		if err := openURL(mr.WebURL); err != nil {
+			return err
+		}
 	}
+	return nil
 }
