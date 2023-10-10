@@ -31,13 +31,48 @@ func openURL(url string) error {
 	return exec.Command(cmd, args...).Start()
 }
 
-func FetchGroupMergeRequests() [] *gitlab.MergeRequest {
+// getWip converts a boolean pointer to a string representation used for querying GitLab's
+// Merge Request API with regard to draft (Work In Progress - WIP) status.
+// GitLab currently does not support a `draft` query parameter, instead, it uses `wip` (Work In Progress).
+//
+// The function behaves as follows:
+// - If `shouldIncludeDrafts` is nil or points to `false`, "no" is returned to exclude drafts from results.
+// - If `shouldIncludeDrafts` points to `true`, an empty string is returned, which does not filter results
+//   based on draft status, effectively including drafts in the results.
+//
+// Example:
+//   drafts := true
+//   queryParam := getWip(&drafts)  // queryParam will be ""
+//
+// GitLab Merge Requests API documentation:
+// https://docs.gitlab.com/ee/api/merge_requests.html#list-merge-requests
+//
+// Usage:
+// The returned string is intended to be used as the value for the `wip` query parameter in
+// GitLab's Merge Requests API.
+//
+//   options := &gitlab.ListMergeRequestsOptions{
+//       WIP: gitlab.String(getWip(&drafts)),
+//   }
+//   mergeRequests, _, err := gitlabClient.MergeRequests.ListMergeRequests(projectID, options)
+func getWip(shouldIncludeDrafts *bool) string {
+	wip := "no"
+
+	if shouldIncludeDrafts != nil && *shouldIncludeDrafts {
+		wip = ""
+	}
+
+	return wip
+}
+
+func FetchGroupMergeRequests(shouldIncludeDrafts *bool) [] *gitlab.MergeRequest {
 	var groupMrs [] *gitlab.MergeRequest
-	
+
 	for _, username := range config.Usernames {
 		userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
-			State: gitlab.String("opened"),
 			AuthorUsername: gitlab.String(username),
+			State: gitlab.String("opened"),
+			WIP: gitlab.String(getWip(shouldIncludeDrafts)),
 		})
 		if err != nil {
 			log.Fatalf("💀 Failed to get merge request for %s: %v", username, err)
@@ -49,13 +84,14 @@ func FetchGroupMergeRequests() [] *gitlab.MergeRequest {
 	return groupMrs
 }
 
-func FetchProjectMergeRequests(projectId string, usernames []string) [] *gitlab.MergeRequest {
+func FetchProjectMergeRequests(projectId string, usernames []string, shouldIncludeDrafts *bool) [] *gitlab.MergeRequest {
 	var projectMrs [] *gitlab.MergeRequest
 	
 	for _, username := range usernames {
 		userMrs, _, err := glab.Client.MergeRequests.ListProjectMergeRequests(projectId, &gitlab.ListProjectMergeRequestsOptions{
-			State: gitlab.String("opened"),
 			AuthorUsername: gitlab.String(username),
+			State: gitlab.String("opened"),
+			WIP: gitlab.String(getWip(shouldIncludeDrafts)),
 		})
 		if err != nil {
 			log.Fatalf("💀 Failed to get merge request for %s: %v", username, err)
