@@ -19,43 +19,43 @@ func main() {
 
 	isNewInstall := false
     if _, err := os.Stat(macglabUri); os.IsNotExist(err) {
-		fmt.Println("macglab: 🆕 No previous installation detected. *cracks knuckles* Starting from scratch...")
-        isNewInstall = true
+			fmt.Println("macglab: 🆕 No previous installation detected. *cracks knuckles* Starting from scratch...")
+					isNewInstall = true
 
-		fmt.Println("macglab: 🏠 Making home directory for macglab...")
-		cmd := exec.Command("mkdir", macglabUri)
-		err := cmd.Run()
-		if err != nil {
-			log.Fatal("macglab: 💀 Couldn't create macglab config directory.")
-		}
-
-		fmt.Println("macglab: 🐚 Adding environment variables...")
-		shConfigUrl := fmt.Sprintf("%s/.zshrc", homeUri)
-		shConfig, err := os.OpenFile(shConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
-		if err != nil {
-			log.Fatal("macglab: 💀 Couldn't write to shell config file.")
-		}
-		defer shConfig.Close()
-
-		writer := bufio.NewWriter(shConfig)
-
-		lines := []string{
-			"",
-			"# [`macglab`](https://github.com/mjburtenshaw/macglab)",
-			`export MACGLAB="${HOME}/.macglab"`,
-			`export PATH="${MACGLAB}/bin:${PATH}"`,
-			`alias macglab="${MACGLAB}/bin"`,
-			"",
-		}
-
-		for _, line := range lines {
-			_, err := writer.WriteString(line + "\n")
+			fmt.Println("macglab: 🏠 Making home directory for macglab...")
+			cmd := exec.Command("mkdir", macglabUri)
+			err := cmd.Run()
 			if err != nil {
-				log.Fatal("macglab: 💀 Couldn't write line to shell config file.")
+				log.Fatal("macglab: 💀 Couldn't create macglab config directory.")
 			}
-		}
 
-		writer.Flush()
+			fmt.Println("macglab: 🐚 Adding environment variables...")
+			shConfigUrl := fmt.Sprintf("%s/.zshrc", homeUri)
+			shConfig, err := os.OpenFile(shConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
+			if err != nil {
+				log.Fatal("macglab: 💀 Couldn't write to shell config file.")
+			}
+			defer shConfig.Close()
+
+			writer := bufio.NewWriter(shConfig)
+
+			lines := []string{
+				"",
+				"# [`macglab`](https://github.com/mjburtenshaw/macglab)",
+				`export MACGLAB="${HOME}/.macglab"`,
+				`export PATH="${MACGLAB}/bin:${PATH}"`,
+				`alias macglab="${MACGLAB}/bin"`,
+				"",
+			}
+
+			for _, line := range lines {
+				_, err := writer.WriteString(line + "\n")
+				if err != nil {
+					log.Fatal("macglab: 💀 Couldn't write line to shell config file.")
+				}
+			}
+
+			writer.Flush()
     }
 
 	fmt.Println("macglab: 🔨 Building executable...")
@@ -90,9 +90,9 @@ func main() {
 	}
 
 	fmt.Println("macglab: 🎉 Successfully installed!")
-	fmt.Println("macglab: 🐚 Re-source your shell session or open a new terminal, then run `macglab` and watch the magic happen!")
-
+	
 	if isNewInstall {
 		fmt.Printf("macglab: 📜 Created a new config file at %s. Please open it and define values.\n", macglabConfigUrl)
+		fmt.Println("macglab: 🐚 Re-source your shell session or open a new terminal, then run `macglab` and watch the magic happen!")
 	}
 }
