@@ -20,7 +20,10 @@ func main() {
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*groupFlag && !*projectsFlag) || *groupFlag {
-		groupMrs := mrs.FetchGroupMergeRequests(draftFlag)
+		groupMrs, err := mrs.FetchGroupMergeRequests(draftFlag)
+		if err != nil {
+			panic(err)
+		}
 		allMrs = append(allMrs, groupMrs...)
 	}
 

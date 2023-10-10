@@ -65,23 +65,36 @@ func getWip(shouldIncludeDrafts *bool) string {
 	return wip
 }
 
-func FetchGroupMergeRequests(shouldIncludeDrafts *bool) [] *gitlab.MergeRequest {
-	var groupMrs [] *gitlab.MergeRequest
+// FetchGroupMergeRequests fetches merge requests for a group from GitLab.
+// It returns a slice of pointers to gitlab.MergeRequest and an error, if any occurs.
+func FetchGroupMergeRequests(shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	var groupMrs []*gitlab.MergeRequest
 
 	for _, username := range config.Usernames {
-		userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
-			AuthorUsername: gitlab.String(username),
-			State: gitlab.String("opened"),
-			WIP: gitlab.String(getWip(shouldIncludeDrafts)),
-		})
+		userMrs, err := fetchUserMergeRequests(username, shouldIncludeDrafts)
 		if err != nil {
-			log.Fatalf("💀 Failed to get merge request for %s: %v", username, err)
+			return nil, err
 		}
-
 		groupMrs = append(groupMrs, userMrs...)
 	}
-	
-	return groupMrs
+
+	return groupMrs, nil
+}
+
+// fetchUserMergeRequests fetches merge requests for a specific user within a group from GitLab.
+// It returns a slice of pointers to gitlab.MergeRequest and an error, if any occurs.
+func fetchUserMergeRequests(username string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
+		AuthorUsername: gitlab.String(username),
+		State:          gitlab.String("opened"),
+		WIP:            gitlab.String(getWip(shouldIncludeDrafts)),
+	})
+	if err != nil {
+		log.Printf("💀 Failed to get merge requests for %s: %v\n", username, err)
+		return nil, err
+	}
+
+	return userMrs, nil
 }
 
 func FetchProjectMergeRequests(projectId string, usernames []string, shouldIncludeDrafts *bool) [] *gitlab.MergeRequest {
