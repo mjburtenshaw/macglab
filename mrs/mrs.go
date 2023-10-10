@@ -36,14 +36,16 @@ func openURL(url string) error {
 	return exec.Command(cmd, args...).Start()
 }
 
-// getWIPQueryParam converts a boolean pointer to a string representation for querying GitLab's
+// getWIPQueryParamPointer converts a boolean pointer to a string representation for querying GitLab's
 // Merge Request API with regard to Work In Progress (WIP) status.
-func getWIPQueryParam(shouldIncludeDrafts *bool) string {
-	wip := "no"
-	if shouldIncludeDrafts != nil && *shouldIncludeDrafts {
-		wip = ""
+func getWIPQueryParamPointer(shouldIncludeDrafts *bool) *string {
+	// We don't want to filter by WIP status if we're including drafts.
+	// Setting wip to "yes" will filter results by *only* drafts.
+	if shouldIncludeDrafts == nil || *shouldIncludeDrafts {
+		return nil
 	}
-	return wip
+	wip := "no"
+	return &wip
 }
 
 // FetchGroupMergeRequests fetches merge requests for a group from GitLab.
@@ -66,7 +68,7 @@ func fetchUserMergeRequests(username string, shouldIncludeDrafts *bool) ([]*gitl
 	userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
 		AuthorUsername: gitlab.String(username),
 		State:          gitlab.String("opened"),
-		WIP:            gitlab.String(getWIPQueryParam(shouldIncludeDrafts)),
+		WIP:            getWIPQueryParamPointer(shouldIncludeDrafts),
 	})
 	if err != nil {
 		log.Printf("Failed to get merge requests for %s: %v\n", username, err)
@@ -84,7 +86,7 @@ func FetchProjectMergeRequests(projectId string, usernames []string, shouldInclu
 		userMrs, _, err := glab.Client.MergeRequests.ListProjectMergeRequests(projectId, &gitlab.ListProjectMergeRequestsOptions{
 			AuthorUsername: gitlab.String(username),
 			State:          gitlab.String("opened"),
-			WIP:            gitlab.String(getWIPQueryParam(shouldIncludeDrafts)),
+			WIP:            getWIPQueryParamPointer(shouldIncludeDrafts),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get merge request for %s: %w", username, err)
