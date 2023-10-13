@@ -29,6 +29,12 @@ Run `macglab` in a shell:
 
 > 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
 
+- Use the `-users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
+
+```sh
+macglab -users=harry,hermoine,ron
+```
+
 Installation
 -------------
 

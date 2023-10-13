@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"strings"
 
 	"github.com/mjburtenshaw/macglab/config"
 	"github.com/mjburtenshaw/macglab/mrs"
@@ -15,9 +16,16 @@ func main() {
 	groupFlag := flag.Bool("group", false, "Filter output to the usernames configuration.")
 	projectsFlag := flag.Bool("projects", false, "Filter output to the projects configuration.")
 
+	var flagUsernamesRaw string
+	flag.StringVar(&flagUsernamesRaw, "users", "", "Filter output to the specified usernames.")
+
 	flag.Parse()
 
-	allMrs, err := fetchMergeRequests(draftFlag, groupFlag, projectsFlag)
+	flagUsernamesRaw = strings.ReplaceAll(flagUsernamesRaw, " ", "")
+
+	flagUsernames := strings.Split(flagUsernamesRaw, ",")
+
+	allMrs, err := fetchMergeRequests(draftFlag, groupFlag, projectsFlag, flagUsernames)
 	if err != nil {
 		log.Fatalf("Failed to fetch merge requests: %v", err)
 	}
@@ -31,12 +39,12 @@ func main() {
 	}
 }
 
-func fetchMergeRequests(draftFlag, groupFlag, projectsFlag *bool) ([]*gitlab.MergeRequest, error) {
+func fetchMergeRequests(draftFlag, groupFlag, projectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*groupFlag && !*projectsFlag) || *groupFlag {
-		groupUsernames := config.Usernames
-		groupMrs, err := mrs.FetchGroupMergeRequests(groupUsernames, draftFlag)
+		usernames := chooseUsernames(flagUsernames, config.Usernames)
+		groupMrs, err := mrs.FetchGroupMergeRequests(usernames, draftFlag)
 		if err != nil {
 			return nil, err
 		}
@@ -44,12 +52,13 @@ func fetchMergeRequests(draftFlag, groupFlag, projectsFlag *bool) ([]*gitlab.Mer
 	}
 
 	if (!*groupFlag && !*projectsFlag) || *projectsFlag {
-		allUsernames := config.Projects["all"]
+		allProjectUsernames := config.Projects["all"]
 
-		for project, usernames := range config.Projects {
+		for project, thisProjectUsernames := range config.Projects {
 			if project != "all" {
-				combinedUsernames := append(usernames, allUsernames...)
-				projectMrs, err := mrs.FetchProjectMergeRequests(project, combinedUsernames, draftFlag)
+				projectUsernames := append(thisProjectUsernames, allProjectUsernames...)
+				usernames := chooseUsernames(flagUsernames, projectUsernames)
+				projectMrs, err := mrs.FetchProjectMergeRequests(project, usernames, draftFlag)
 				if err != nil {
 					return nil, err
 				}
@@ -59,4 +68,12 @@ func fetchMergeRequests(draftFlag, groupFlag, projectsFlag *bool) ([]*gitlab.Mer
 	}
 
 	return allMrs, nil
+}
+
+// chooseUsernames chooses usernames provided via the user flag over the config.
+func chooseUsernames(flagUsernames []string, configUsernames []string) []string {
+	if len(flagUsernames) != 0 {
+		return flagUsernames
+	}
+	return configUsernames
 }
