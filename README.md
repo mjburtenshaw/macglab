@@ -8,7 +8,7 @@ This program lists all GitLab Merge Requests (MRs) based on:
 - Specified usernames and/or projects
 - Specified group
 
-![Static Badge](https://img.shields.io/badge/version-2.3.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-2.4.0-66023c)
 
 Table of Contents
 ------------------
@@ -28,6 +28,12 @@ Run `macglab` in a shell:
 - Use the `-projects` flag to filter output to the projects configuration.
 
 > 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
+
+- Use the `-users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
+
+```sh
+macglab -users=harry,hermoine,ron
+```
 
 Installation
 -------------
