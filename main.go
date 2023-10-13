@@ -22,8 +22,12 @@ func main() {
 	flag.Parse()
 
 	flagUsernamesRaw = strings.ReplaceAll(flagUsernamesRaw, " ", "")
+	
+	var flagUsernames []string
 
-	flagUsernames := strings.Split(flagUsernamesRaw, ",")
+	if flagUsernamesRaw != "" {
+    flagUsernames = strings.Split(flagUsernamesRaw, ",")
+	}
 
 	allMrs, err := fetchMergeRequests(draftFlag, groupFlag, projectsFlag, flagUsernames)
 	if err != nil {
