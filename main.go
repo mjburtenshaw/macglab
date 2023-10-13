@@ -35,7 +35,8 @@ func fetchMergeRequests(draftFlag, groupFlag, projectsFlag *bool) ([]*gitlab.Mer
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*groupFlag && !*projectsFlag) || *groupFlag {
-		groupMrs, err := mrs.FetchGroupMergeRequests(draftFlag)
+		groupUsernames := config.Usernames
+		groupMrs, err := mrs.FetchGroupMergeRequests(groupUsernames, draftFlag)
 		if err != nil {
 			return nil, err
 		}

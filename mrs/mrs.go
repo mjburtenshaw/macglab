@@ -49,10 +49,10 @@ func getWIPQueryParamPointer(shouldIncludeDrafts *bool) *string {
 }
 
 // FetchGroupMergeRequests fetches merge requests for a group from GitLab.
-func FetchGroupMergeRequests(shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+func FetchGroupMergeRequests(usernames []string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
 	var groupMrs []*gitlab.MergeRequest
 
-	for _, username := range config.Usernames {
+	for _, username := range usernames {
 		userMrs, err := fetchUserMergeRequests(username, shouldIncludeDrafts)
 		if err != nil {
 			return nil, err
