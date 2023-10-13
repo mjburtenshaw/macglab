@@ -67,6 +67,8 @@ func fetchMergeRequests(draftFlag, groupFlag, projectsFlag *bool, flagUsernames 
 		}
 	}
 
+	allMrs = dedupeMergeRequests(allMrs)
+
 	return allMrs, nil
 }
 
@@ -76,4 +78,19 @@ func chooseUsernames(flagUsernames []string, configUsernames []string) []string 
 		return flagUsernames
 	}
 	return configUsernames
+}
+
+func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRequest {
+	seen := map[string]bool{}
+	result := []*gitlab.MergeRequest{}
+
+	for _, mergeRequest := range mergeRequests {
+
+		if !seen[mergeRequest.WebURL] {
+			seen[mergeRequest.WebURL] = true
+			result = append(result, mergeRequest)
+		}
+	}
+
+	return result
 }
