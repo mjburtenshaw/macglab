@@ -14,6 +14,7 @@ Table of Contents
 ------------------
 
 - [Usage](#usage)
+    - [List](#list)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [See Also](#see-also)
@@ -21,19 +22,20 @@ Table of Contents
 Usage
 -----
 
-Run `macglab` in a shell:
-- Use the `-browser` flag to open MRs in the browser.
-- Use the `-drafts` flag to include draft MRs.
-- Use the `-group` flag to filter output to the usernames configuration.
-- Use the `-projects` flag to filter output to the projects configuration.
+### List
 
-> 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
-
-- Use the `-users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
+Run `macglab list` in a shell:
+- Use the `--browser` flag to open MRs in the browser.
+- Use the `--drafts` flag to include draft MRs.
+- Use the `--group` flag to filter output to the usernames configuration.
+- Use the `--projects` flag to filter output to the projects configuration.
+- Use the `--users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
 
 ```sh
-macglab -users=harry,hermoine,ron
+macglab list -users=harry,hermoine,ron
 ```
+
+> 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
 
 Installation
 -------------
