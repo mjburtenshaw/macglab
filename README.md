@@ -8,7 +8,7 @@ This program lists all GitLab Merge Requests (MRs) based on:
 - Specified usernames and/or projects
 - Specified group
 
-![Static Badge](https://img.shields.io/badge/version-3.0.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-3.1.0-66023c)
 
 Table of Contents
 ------------------
@@ -18,6 +18,11 @@ Table of Contents
 - [Installation](#installation)
     - [Requirements](#requirements)
 - [Configuration](#configuration)
+    - [`ACCESS_TOKEN`](#access_token)
+    - [`GROUP_ID`](#group_id)
+    - [`ME`](#me)
+    - [`USERNAMES`](#usernames)
+    - [`PROJECTS`](#projects)
 - [See Also](#see-also)
 
 Usage
@@ -26,11 +31,12 @@ Usage
 ### List
 
 Run `macglab list` in a shell:
+- Use the `-a, --approved` flag to filter output to include MRs approved by [the configured `ME`](#me) user ID.
 - Use the `-b, --browser` flag to open MRs in the browser.
 - Use the `-d, --drafts` flag to include draft MRs.
-- Use the `-g, --group` flag to filter output to the usernames configuration.
-- Use the `-p, --projects` flag to filter output to the projects configuration.
-- Use the `-u, --users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
+- Use the `-g, --group` flag to filter output to [the usernames configuration](#usernames).
+- Use the `-p, --projects` flag to filter output to [the projects configuration](#projects).
+- Use the `-u, --users` flag to override [configured usernames](#usernames) and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
 
 ```sh
 macglab list --users=harry,hermoine,ron
@@ -67,11 +73,27 @@ macglab init
 Configuration
 --------------
 
-Update `config.yml` with:
-- `ACCESS_TOKEN`: A GitLab personal access token[^1].
-- `GROUP_ID`: A GitLab group ID[^2].
-- `USERNAMES`: A list of GitLab usernames in the group you wish to follow.
-- `PROJECTS`: A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
+See [the sample config](/config.sample.yml) for a full example.
+
+### `ACCESS_TOKEN`
+
+A GitLab personal access token[^1].
+
+### `GROUP_ID`
+
+A GitLab group ID[^2].
+
+### `ME`
+
+Your GitLab user ID (though it doesn't *have* to be yours). It's used to filter MRs based on approval.
+
+### `USERNAMES`
+
+A list of GitLab usernames in the group you wish to follow.
+
+### `PROJECTS`
+
+A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
 
 ```yaml
 # usernames listed under the "all" entry will apply to every project listed below.
@@ -94,8 +116,6 @@ PROJECTS:
         # projectD
         - username4
 ```
-
-See [the sample config](/config.sample.yml) for a full example.
 
 See Also
 ---------

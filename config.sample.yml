@@ -2,6 +2,8 @@ ACCESS_TOKEN: <your_access_token_here>
 
 GROUP_ID: <your_group_id_here>
 
+ME: <your_gitlab_user_id_here>
+
 # usernames listed under the "all" entry will apply to every project listed below.
 PROJECTS:
     all:

@@ -114,3 +114,17 @@ func OpenMergeRequests(mrs []*gitlab.MergeRequest) error {
 	}
 	return nil
 }
+
+func GetMergeRequestsApprovedByMe(myId int, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	mrsApprovedByMe, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
+		ApprovedByIDs: gitlab.ApproverIDs([]int{myId}),
+		State:         gitlab.String("opened"),
+		WIP:           getWIPQueryParamPointer(shouldIncludeDrafts),
+	})
+	if err != nil {
+		log.Printf("Failed to get merge requests approved by me: %v\n", err)
+		return nil, err
+	}
+
+	return mrsApprovedByMe, nil
+}
