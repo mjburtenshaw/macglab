@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bufio"
@@ -6,9 +6,24 @@ import (
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/spf13/cobra"
 )
 
-func main() {
+func init() {
+	rootCmd.AddCommand(installCmd)
+}
+
+var installCmd = &cobra.Command{
+	Use:   "install",
+	Short: "Installs macglab",
+	Long:  `Installs macglab`,
+	Run: func(cmd *cobra.Command, args []string) {
+		install()
+	},
+}
+
+func install() {
 	fmt.Println("macglab: 🏗️  Installing macglab...")
 	homeUri := os.Getenv("HOME")
 	if homeUri == "" {
@@ -42,9 +57,9 @@ func main() {
 			lines := []string{
 				"",
 				"# [`macglab`](https://github.com/mjburtenshaw/macglab)",
+				"",
 				`export MACGLAB="${HOME}/.macglab"`,
 				`export PATH="${MACGLAB}/bin:${PATH}"`,
-				`alias macglab="${MACGLAB}/bin"`,
 				"",
 			}
 
