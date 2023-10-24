@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mjburtenshaw/macglab/config"
+	"github.com/mjburtenshaw/macglab/glab"
 	"github.com/mjburtenshaw/macglab/mrs"
 	"github.com/spf13/cobra"
 	"github.com/xanzy/go-gitlab"
@@ -30,7 +31,16 @@ var listCmd = &cobra.Command{
 	Short: "List merge requests",
 	Long:  `List merge requests using your config or specifed flags`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config.Read()
+		err := config.Read()
+		if err != nil {
+			log.Fatalf("Failed to read config: %v", err)
+		}
+
+		err = glab.Initialize()
+		if err != nil {
+			log.Fatalf("Failed to initialize gitlab client: %v", err)
+		}
+
 		FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
 		var flagUsernames []string
 		if FlagUsernamesRaw != "" {

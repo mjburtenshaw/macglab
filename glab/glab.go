@@ -1,8 +1,6 @@
 package glab
 
 import (
-	"log"
-
 	"github.com/xanzy/go-gitlab"
 
 	"github.com/mjburtenshaw/macglab/config"
@@ -10,11 +8,13 @@ import (
 
 var Client *gitlab.Client
 
-func init() {
+func Initialize() error {
 	client, err := gitlab.NewClient(config.AccessToken)
 	if err != nil {
-		log.Fatalf("💀 Failed to create client: %v", err)
+		return err
 	}
 
 	Client = client
+
+	return nil
 }
