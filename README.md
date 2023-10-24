@@ -17,6 +17,7 @@ Table of Contents
     - [List](#list)
 - [Installation](#installation)
     - [Requirements](#requirements)
+    - [Updating](#updating)
 - [Configuration](#configuration)
     - [`ACCESS_TOKEN`](#access_token)
     - [`GROUP_ID`](#group_id)
@@ -69,6 +70,16 @@ macglab init
 2. Define values in the config file at `$HOME/.macglab/`. See [configuration](#configuration) for details.
 
 3. Re-source your shell or open a new terminal to run the `macglab list` command!
+
+### Updating
+
+To update to the latest version, pull the latest from the repository and reinstall the binary:
+
+```sh
+git checkout main
+git pull
+go install
+```
 
 Configuration
 --------------
