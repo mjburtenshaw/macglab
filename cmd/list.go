@@ -29,7 +29,12 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List merge requests",
-	Long:  `List merge requests using your config or specifed flags`,
+	Long:  `List merge requests using the following options:
+	- Use the '-b, --browser' flag to open MRs in the browser.
+	- Use the '-d, --drafts' flag to include draft MRs.
+	- Use the '-g, --group' flag to filter output to the usernames configuration.
+	- Use the '-p, --projects' flag to filter output to the projects configuration.
+	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := config.Read()
 		if err != nil {
