@@ -8,7 +8,7 @@ This program lists all GitLab Merge Requests (MRs) based on:
 - Specified usernames and/or projects
 - Specified group
 
-![Static Badge](https://img.shields.io/badge/version-2.4.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-3.0.0-66023c)
 
 Table of Contents
 ------------------
@@ -16,6 +16,7 @@ Table of Contents
 - [Usage](#usage)
     - [List](#list)
 - [Installation](#installation)
+    - [Requirements](#requirements)
 - [Configuration](#configuration)
 - [See Also](#see-also)
 
@@ -25,14 +26,14 @@ Usage
 ### List
 
 Run `macglab list` in a shell:
-- Use the `--browser` flag to open MRs in the browser.
-- Use the `--drafts` flag to include draft MRs.
-- Use the `--group` flag to filter output to the usernames configuration.
-- Use the `--projects` flag to filter output to the projects configuration.
-- Use the `--users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
+- Use the `-b, --browser` flag to open MRs in the browser.
+- Use the `-d, --drafts` flag to include draft MRs.
+- Use the `-g, --group` flag to filter output to the usernames configuration.
+- Use the `-p, --projects` flag to filter output to the projects configuration.
+- Use the `-u, --users` flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
 
 ```sh
-macglab list -users=harry,hermoine,ron
+macglab list --users=harry,hermoine,ron
 ```
 
 > 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
@@ -40,15 +41,28 @@ macglab list -users=harry,hermoine,ron
 Installation
 -------------
 
-1. Clone this repository, move into it, and run the install script:
+### Requirements
+
+1. Verify you have [installed Go](https://go.dev/doc/install): `go version`
+2. Verify you have `GOPATH` in your shell environment: `echo "${GOPATH}"`
+3. Verify you have added Go binaries to your `PATH`: `export PATH="${GOPATH}/bin:${PATH}"`
+
+> 🐚 ***Tip:** it might be worth it to add the last command to your shell config file.*
+
+--------------------------------------------------------------------------------------------
+
+1. Clone this repository, move into it, install the binary, and run the install script:
 
 ```sh
 git clone https://github.com/mjburtenshaw/macglab.git
 cd macglab
-go run install/install.go
+go install
+macglab init
 ```
 
-2. Re-source your shell or open a new terminal to run the `macglab` command!
+2. Define values in the config file at `$HOME/.macglab/`
+
+3. Re-source your shell or open a new terminal to run the `macglab list` command!
 
 Configuration
 --------------

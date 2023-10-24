@@ -30,6 +30,7 @@ var listCmd = &cobra.Command{
   Short: "List merge requests",
   Long: `List merge requests using your config or specifed flags`,
   Run: func(cmd *cobra.Command, args []string) {
+			config.Read()
 			FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
 			var flagUsernames []string
 			if FlagUsernamesRaw != "" {

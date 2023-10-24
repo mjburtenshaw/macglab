@@ -23,7 +23,7 @@ var (
 	Usernames   []string
 )
 
-func init() {
+func Read() {
 	configHome := os.Getenv("MACGLAB")
 	if configHome == "" {
 		log.Fatal("💀 Couldn't find MACGLAB environment variable")
