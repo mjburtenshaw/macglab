@@ -70,6 +70,7 @@ Configuration
 Update `config.yml` with:
 - `ACCESS_TOKEN`: A GitLab personal access token[^1].
 - `GROUP_ID`: A GitLab group ID[^2].
+- `ME`: Your GitLab username (though it doesn't *have* to be yours). It's used to filter MRs based on approval.
 - `USERNAMES`: A list of GitLab usernames in the group you wish to follow.
 - `PROJECTS`: A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
 
