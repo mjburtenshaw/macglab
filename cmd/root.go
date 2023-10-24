@@ -8,9 +8,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-  Use:   "macglab",
-  Short: "macglab automates gathering your work on gitlab.com to save time.",
-  Long: `macglab automates gathering your work on gitlab.com to save time.
+	Use:   "macglab",
+	Short: "macglab automates gathering your work on gitlab.com to save time.",
+	Long: `macglab automates gathering your work on gitlab.com to save time.
 
 					This program lists all GitLab Merge Requests (MRs) based on:
 					
@@ -19,13 +19,13 @@ var rootCmd = &cobra.Command{
 					- Specified group
 					
 					Complete documentation is available at https://github.com/mjburtenshaw/macglab`,
-  Run: func(cmd *cobra.Command, args []string) {
-  },
+	Run: func(cmd *cobra.Command, args []string) {
+	},
 }
 
 func Execute() {
-  if err := rootCmd.Execute(); err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

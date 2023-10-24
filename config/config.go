@@ -9,17 +9,17 @@ import (
 )
 
 type Config struct {
-	AccessToken string   `yaml:"ACCESS_TOKEN"`
-	GroupId     string   `yaml:"GROUP_ID"`
+	AccessToken string              `yaml:"ACCESS_TOKEN"`
+	GroupId     string              `yaml:"GROUP_ID"`
 	Projects    map[string][]string `yaml:"PROJECTS"`
-	Usernames   []string `yaml:"USERNAMES"`
+	Usernames   []string            `yaml:"USERNAMES"`
 }
 
 var (
-	config     *Config
+	config      *Config
 	AccessToken string
 	GroupId     string
-	Projects map[string][]string
+	Projects    map[string][]string
 	Usernames   []string
 )
 

@@ -26,30 +26,30 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-  Use:   "list",
-  Short: "List merge requests",
-  Long: `List merge requests using your config or specifed flags`,
-  Run: func(cmd *cobra.Command, args []string) {
-			config.Read()
-			FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
-			var flagUsernames []string
-			if FlagUsernamesRaw != "" {
-				flagUsernames = strings.Split(FlagUsernamesRaw, ",")
-			}
+	Use:   "list",
+	Short: "List merge requests",
+	Long:  `List merge requests using your config or specifed flags`,
+	Run: func(cmd *cobra.Command, args []string) {
+		config.Read()
+		FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
+		var flagUsernames []string
+		if FlagUsernamesRaw != "" {
+			flagUsernames = strings.Split(FlagUsernamesRaw, ",")
+		}
 
-			allMrs, err := fetchMergeRequests(&DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
-			if err != nil {
-				log.Fatalf("Failed to fetch merge requests: %v", err)
-			}
+		allMrs, err := fetchMergeRequests(&DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
+		if err != nil {
+			log.Fatalf("Failed to fetch merge requests: %v", err)
+		}
 
-			mrs.PrintMergeRequests(allMrs)
+		mrs.PrintMergeRequests(allMrs)
 
-			if BrowserFlag {
-				if err := mrs.OpenMergeRequests(allMrs); err != nil {
-					log.Printf("Failed to open merge requests in the browser: %v", err)
-				}
+		if BrowserFlag {
+			if err := mrs.OpenMergeRequests(allMrs); err != nil {
+				log.Printf("Failed to open merge requests in the browser: %v", err)
 			}
-		},
+		}
+	},
 }
 
 func fetchMergeRequests(DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
