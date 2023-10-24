@@ -60,7 +60,7 @@ go install
 macglab init
 ```
 
-2. Define values in the config file at `$HOME/.macglab/`
+2. Define values in the config file at `$HOME/.macglab/`. See [configuration](#configuration) for details.
 
 3. Re-source your shell or open a new terminal to run the `macglab list` command!
 
