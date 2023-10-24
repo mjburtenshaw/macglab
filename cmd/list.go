@@ -11,14 +11,18 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-var BrowserFlag bool
-var DraftFlag bool
-var GroupFlag bool
-var ProjectsFlag bool
-var FlagUsernamesRaw string
+var (
+	ApprovedFlag     bool
+	BrowserFlag      bool
+	DraftFlag        bool
+	GroupFlag        bool
+	ProjectsFlag     bool
+	FlagUsernamesRaw string
+)
 
 func init() {
 	rootCmd.AddCommand(listCmd)
+	listCmd.PersistentFlags().BoolVarP(&ApprovedFlag, "approved", "a", false, "Filter output to include MRs approved by the configured ME user ID.")
 	listCmd.PersistentFlags().BoolVarP(&BrowserFlag, "browser", "b", false, "Open merge requests in the browser.")
 	listCmd.PersistentFlags().BoolVarP(&DraftFlag, "draft", "d", false, "Filter output to include draft merge requests.")
 	listCmd.PersistentFlags().BoolVarP(&GroupFlag, "group", "g", false, "Filter output to the usernames configuration.")
@@ -29,7 +33,8 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List merge requests",
-	Long:  `List merge requests using the following options:
+	Long: `List merge requests using the following options:
+	- Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'ME' user ID.
 	- Use the '-b, --browser' flag to open MRs in the browser.
 	- Use the '-d, --drafts' flag to include draft MRs.
 	- Use the '-g, --group' flag to filter output to the usernames configuration.
@@ -97,6 +102,14 @@ func fetchMergeRequests(DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames 
 
 	allMrs = dedupeMergeRequests(allMrs)
 
+	if !ApprovedFlag && config.Me != 0 {
+		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(allMrs)
+		if err != nil {
+			return nil, err
+		}
+		allMrs = mrsNotApprovedByMe
+	}
+
 	return allMrs, nil
 }
 
@@ -121,4 +134,27 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	}
 
 	return result
+}
+
+func excludeMrsApprovedByMe(allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(config.Me, &DraftFlag)
+	if err != nil {
+		return nil, err
+	}
+
+	mrsNotApprovedByMe := []*gitlab.MergeRequest{}
+	for _, mr := range allMrs {
+		isApproved := false
+		for _, approvedMr := range approvedMrs {
+			if mr.IID == approvedMr.IID {
+				isApproved = true
+				break
+			}
+		}
+		if !isApproved {
+			mrsNotApprovedByMe = append(mrsNotApprovedByMe, mr)
+		}
+	}
+
+	return mrsNotApprovedByMe, nil
 }

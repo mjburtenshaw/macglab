@@ -10,7 +10,7 @@ import (
 type Config struct {
 	AccessToken string              `yaml:"ACCESS_TOKEN"`
 	GroupId     string              `yaml:"GROUP_ID"`
-	Me					string							`yaml:"ME"`
+	Me          int                 `yaml:"ME"`
 	Projects    map[string][]string `yaml:"PROJECTS"`
 	Usernames   []string            `yaml:"USERNAMES"`
 }
@@ -19,7 +19,7 @@ var (
 	config      *Config
 	AccessToken string
 	GroupId     string
-	Me					string
+	Me          int
 	Projects    map[string][]string
 	Usernames   []string
 )
