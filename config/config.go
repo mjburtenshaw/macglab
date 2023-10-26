@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -41,3 +43,19 @@ func Read() error {
 	Usernames = config.Usernames
 	return nil
 }
+
+func DemandConfigDir() error {
+    info, err := os.Stat(MacglabUri)
+    if err != nil {
+        if os.IsNotExist(err) {
+            log.Println("macglab: 🏠 Making home directory for macglab...")
+            err = os.MkdirAll(MacglabUri, 0755)
+            return err
+        }
+        return err
+    } else if !info.IsDir() {
+        return fmt.Errorf("%s exists but is not a directory", MacglabUri)
+    }
+    return nil
+}
+
