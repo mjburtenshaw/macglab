@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -25,12 +24,7 @@ var (
 )
 
 func Read() error {
-	configHome := os.Getenv("MACGLAB")
-	if configHome == "" {
-		return fmt.Errorf("💀 Couldn't find MACGLAB environment variable")
-	}
-
-	configFile, err := os.ReadFile(fmt.Sprintf("%s/config.yml", configHome))
+	configFile, err := os.ReadFile(MacglabConfigUrl)
 	if err != nil {
 		return err
 	}
