@@ -29,13 +29,13 @@ var initCmd = &cobra.Command{
 
 			err := config.DemandConfigDir()
 			if err != nil {
-				log.Panicf("macglab: 💀 Couldn't create macglab config directory: %s", err)
+				log.Fatalf("macglab: 💀 Couldn't create macglab config directory: %s", err)
 			}
 
 			fmt.Println("macglab: 🐚 Adding environment variables...")
 			shConfig, err := os.OpenFile(config.ShConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
 			if err != nil {
-				log.Fatal("macglab: 💀 Couldn't write to shell config file.")
+				log.Fatalf("macglab: 💀 Couldn't write to shell config file: %s", err)
 			}
 			defer shConfig.Close()
 
