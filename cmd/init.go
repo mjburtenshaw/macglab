@@ -26,6 +26,7 @@ var initCmd = &cobra.Command{
 			fmt.Println("macglab: 🆕 No previous installation detected. *cracks knuckles* Starting from scratch...")
 			isNewInstall = true
 
+			log.Println("macglab: demanding a home directory for macglab...")
 			if err := config.DemandConfigDir(); err != nil {
 				log.Fatalf("macglab: couldn't create macglab config directory: %s", err)
 			}

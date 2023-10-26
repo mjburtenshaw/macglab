@@ -41,12 +41,14 @@ var listCmd = &cobra.Command{
 	- Use the '-p, --projects' flag to filter output to the projects configuration.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := config.Read()
+		conf, err := config.Get(config.MacglabConfigUrl)
 		if err != nil {
 			log.Fatalf("Failed to read config: %v", err)
 		}
 
-		err = glab.Initialize()
+		accessToken := conf.AccessToken
+
+		err = glab.Initialize(accessToken)
 		if err != nil {
 			log.Fatalf("Failed to initialize gitlab client: %v", err)
 		}
@@ -57,7 +59,7 @@ var listCmd = &cobra.Command{
 			flagUsernames = strings.Split(FlagUsernamesRaw, ",")
 		}
 
-		allMrs, err := fetchMergeRequests(&DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
+		allMrs, err := fetchMergeRequests(conf, &DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
 		if err != nil {
 			log.Fatalf("Failed to fetch merge requests: %v", err)
 		}
@@ -72,12 +74,12 @@ var listCmd = &cobra.Command{
 	},
 }
 
-func fetchMergeRequests(DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
+func fetchMergeRequests(conf *config.Config, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*GroupFlag && !*ProjectsFlag) || *GroupFlag {
-		usernames := chooseUsernames(flagUsernames, config.Usernames)
-		groupMrs, err := mrs.FetchGroupMergeRequests(usernames, DraftFlag)
+		usernames := chooseUsernames(flagUsernames, conf.Usernames)
+		groupMrs, err := mrs.FetchGroupMergeRequests(conf.GroupId, usernames, DraftFlag)
 		if err != nil {
 			return nil, err
 		}
@@ -85,9 +87,9 @@ func fetchMergeRequests(DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames 
 	}
 
 	if (!*GroupFlag && !*ProjectsFlag) || *ProjectsFlag {
-		allProjectUsernames := config.Projects["all"]
+		allProjectUsernames := conf.Projects["all"]
 
-		for project, thisProjectUsernames := range config.Projects {
+		for project, thisProjectUsernames := range conf.Projects {
 			if project != "all" {
 				projectUsernames := append(thisProjectUsernames, allProjectUsernames...)
 				usernames := chooseUsernames(flagUsernames, projectUsernames)
@@ -102,8 +104,8 @@ func fetchMergeRequests(DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames 
 
 	allMrs = dedupeMergeRequests(allMrs)
 
-	if !ApprovedFlag && config.Me != 0 {
-		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(allMrs)
+	if !ApprovedFlag && conf.Me != 0 {
+		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(conf, allMrs)
 		if err != nil {
 			return nil, err
 		}
@@ -136,8 +138,8 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	return result
 }
 
-func excludeMrsApprovedByMe(allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
-	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(config.Me, &DraftFlag)
+func excludeMrsApprovedByMe(conf *config.Config, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(conf.GroupId, conf.Me, &DraftFlag)
 	if err != nil {
 		return nil, err
 	}

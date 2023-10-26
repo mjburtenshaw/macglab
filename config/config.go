@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
@@ -27,30 +26,32 @@ var (
 	Usernames   []string
 )
 
-func Read() error {
-	configFile, err := os.ReadFile(MacglabConfigUrl)
+func Get(configUrl string) (*Config, error) {
+    if err := read(configUrl); err != nil {
+        return nil, fmt.Errorf("couldn't get config at %s: %w", configUrl, err)
+    }
+    return config, nil
+}
+
+func read(configUrl string) error {
+    if err := CheckFileExists(configUrl); err != nil {
+        return fmt.Errorf("couldn't find %s: %w", configUrl, err)
+    }
+
+	configFile, err := os.ReadFile(configUrl)
 	if err != nil {
 		return err
 	}
 
 	err = yaml.Unmarshal(configFile, &config)
-	if err != nil {
-		return err
-	}
 
-	AccessToken = config.AccessToken
-	GroupId = config.GroupId
-	Me = config.Me
-	Projects = config.Projects
-	Usernames = config.Usernames
-	return nil
+	return err
 }
 
 func DemandConfigDir() error {
     info, err := os.Stat(MacglabUri)
     if err != nil {
         if os.IsNotExist(err) {
-            log.Println("macglab: making home directory for macglab...")
             err = os.MkdirAll(MacglabUri, 0755)
             return err
         }
@@ -92,11 +93,8 @@ func AddEnv(shConfigUrl string) (err error) {
 }
 
 func checkAddEnv(shConfigUrl string) (didAddEnv bool, err error) {
-    info, err := os.Stat(shConfigUrl)
-    if err != nil {
-        return false, fmt.Errorf("%s doesn't exist: %w", shConfigUrl, err)
-    } else if info.IsDir() {
-        return false, fmt.Errorf("%s exists but is a directory", shConfigUrl)
+    if err := CheckFileExists(shConfigUrl); err != nil {
+        return false, fmt.Errorf("couldn't find %s: %w", shConfigUrl, err)
     }
 
     shConfig, err := os.Open(shConfigUrl)
