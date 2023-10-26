@@ -30,7 +30,7 @@ var initCmd = &cobra.Command{
 				log.Fatalf("macglab: couldn't create macglab config directory: %s", err)
 			}
 
-			if err := config.WriteNew(config.ShConfigUrl); err != nil {
+			if err := config.AddEnv(config.ShConfigUrl); err != nil {
 				log.Fatalf("macglab: couldn't add environment variables: %s", err)
 			}
 		}

@@ -59,7 +59,7 @@ func DemandConfigDir() error {
     return nil
 }
 
-func WriteNew(shConfigUrl string) error {
+func AddEnv(shConfigUrl string) error {
     fmt.Println("macglab: adding environment variables...")
     info, err := os.Stat(shConfigUrl)
     if err != nil {
