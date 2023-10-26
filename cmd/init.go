@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -27,37 +26,13 @@ var initCmd = &cobra.Command{
 			fmt.Println("macglab: 🆕 No previous installation detected. *cracks knuckles* Starting from scratch...")
 			isNewInstall = true
 
-			err := config.DemandConfigDir()
-			if err != nil {
-				log.Fatalf("macglab: 💀 Couldn't create macglab config directory: %s", err)
+			if err := config.DemandConfigDir(); err != nil {
+				log.Fatalf("macglab: couldn't create macglab config directory: %s", err)
 			}
 
-			fmt.Println("macglab: 🐚 Adding environment variables...")
-			shConfig, err := os.OpenFile(config.ShConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
-			if err != nil {
-				log.Fatalf("macglab: 💀 Couldn't write to shell config file: %s", err)
+			if err := config.WriteNew(config.ShConfigUrl); err != nil {
+				log.Fatalf("macglab: couldn't add environment variables: %s", err)
 			}
-			defer shConfig.Close()
-
-			writer := bufio.NewWriter(shConfig)
-
-			lines := []string{
-				"",
-				"# [`macglab`](https://github.com/mjburtenshaw/macglab)",
-				"",
-				`export MACGLAB="${HOME}/.macglab"`,
-				`export PATH="${GOPATH}/bin/macglab:${PATH}"`,
-				"",
-			}
-
-			for _, line := range lines {
-				_, err := writer.WriteString(line + "\n")
-				if err != nil {
-					log.Fatal("macglab: 💀 Couldn't write line to shell config file.")
-				}
-			}
-
-			writer.Flush()
 		}
 
 		if isNewInstall {

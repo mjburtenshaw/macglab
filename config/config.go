@@ -48,7 +48,7 @@ func DemandConfigDir() error {
     info, err := os.Stat(MacglabUri)
     if err != nil {
         if os.IsNotExist(err) {
-            log.Println("macglab: 🏠 Making home directory for macglab...")
+            log.Println("macglab: making home directory for macglab...")
             err = os.MkdirAll(MacglabUri, 0755)
             return err
         }
@@ -59,3 +59,31 @@ func DemandConfigDir() error {
     return nil
 }
 
+func WriteNew(shConfigUrl string) error {
+    fmt.Println("macglab: adding environment variables...")
+    info, err := os.Stat(shConfigUrl)
+    if err != nil {
+        return fmt.Errorf("%s doesn't exist: %w", shConfigUrl, err)
+    } else if info.IsDir() {
+        return fmt.Errorf("%s exists but is a directory", shConfigUrl)
+    }
+
+    shConfig, err := os.OpenFile(shConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
+    if err != nil {
+        return fmt.Errorf("couldn't open %s: %w", shConfigUrl, err)
+    }
+
+    defer shConfig.Close()
+
+    newConfig := `
+    # [macglab](https://github.com/mjburtenshaw/macglab)
+
+    export MACGLAB="${HOME}/.macglab"
+    export PATH="${GOPATH}/bin/macglab:${PATH}"
+    `
+    if _, err := shConfig.WriteString(newConfig); err != nil {
+        return fmt.Errorf("couldn't write to %s: %w", shConfigUrl, err)
+    }
+
+    return nil
+}
