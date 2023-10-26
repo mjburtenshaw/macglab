@@ -22,12 +22,6 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("macglab: 🏗️  Installing macglab...")
 
-		goPath := os.Getenv("GOPATH")
-
-		if goPath == "" {
-			log.Fatal("macglab: 🏚️ Couldn't find GOPATH environment variable.")
-		}
-
 		isNewInstall := false
 		if _, err := os.Stat(config.MacglabUri); os.IsNotExist(err) {
 			fmt.Println("macglab: 🆕 No previous installation detected. *cracks knuckles* Starting from scratch...")

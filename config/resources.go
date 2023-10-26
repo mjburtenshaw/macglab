@@ -16,7 +16,12 @@ var (
 func init() {
 	HomeUri = os.Getenv("HOME")
 	if HomeUri == "" {
-		log.Fatalf("macglab: 🏚️ Couldn't find HOME environment variable")
+		log.Fatal("macglab: 🏚️ Couldn't find HOME environment variable.")
+	}
+
+	goPath := os.Getenv("GOPATH")
+	if goPath == "" {
+		log.Fatal("macglab: 🏚️ Couldn't find GOPATH environment variable.")
 	}
 
 	ShConfigUrl = fmt.Sprintf("%s/.zshrc", HomeUri)
