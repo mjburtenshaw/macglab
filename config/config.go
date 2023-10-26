@@ -75,13 +75,13 @@ func AddEnv(shConfigUrl string) error {
 
     defer shConfig.Close()
 
-    newConfig := `
+    envVariables := `
     # [macglab](https://github.com/mjburtenshaw/macglab)
 
     export MACGLAB="${HOME}/.macglab"
     export PATH="${GOPATH}/bin/macglab:${PATH}"
     `
-    if _, err := shConfig.WriteString(newConfig); err != nil {
+    if _, err := shConfig.WriteString(envVariables); err != nil {
         return fmt.Errorf("couldn't write to %s: %w", shConfigUrl, err)
     }
 
