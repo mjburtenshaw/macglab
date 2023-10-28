@@ -19,7 +19,8 @@ var (
 	DraftFlag        bool
 	GroupFlag        bool
 	ProjectsFlag     bool
-	FlagAccessToken	 string
+	FlagAccessToken  string
+	FlagGroupId      string
 	FlagUsernamesRaw string
 )
 
@@ -29,6 +30,7 @@ func init() {
 	listCmd.PersistentFlags().BoolVarP(&BrowserFlag, "browser", "b", false, "Open merge requests in the browser.")
 	listCmd.PersistentFlags().BoolVarP(&DraftFlag, "draft", "d", false, "Filter output to include draft merge requests.")
 	listCmd.PersistentFlags().BoolVarP(&GroupFlag, "group", "g", false, "Filter output to the usernames configuration.")
+	listCmd.PersistentFlags().StringVarP(&FlagGroupId, "group-id", "i", "", "Override the configured groud ID.")
 	listCmd.PersistentFlags().BoolVarP(&ProjectsFlag, "projects", "p", false, "Filter output to the projects configuration.")
 	listCmd.PersistentFlags().StringVarP(&FlagAccessToken, "access-token", "t", "", "Override the configured access token.")
 	listCmd.PersistentFlags().StringVarP(&FlagUsernamesRaw, "users", "u", "", "Filter output to the specified usernames.")
@@ -42,6 +44,7 @@ var listCmd = &cobra.Command{
 	- Use the '-b, --browser' flag to open MRs in the browser.
 	- Use the '-d, --drafts' flag to include draft MRs.
 	- Use the '-g, --group' flag to filter output to the usernames configuration.
+	- Use the '-i, --group-id' flag to override the configured group ID.
 	- Use the '-p, --projects' flag to filter output to the projects configuration.
 	- Use the '-t, --access-token' flag to override the configured access token.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
@@ -53,9 +56,16 @@ var listCmd = &cobra.Command{
 
 		accessToken := conf.AccessToken
 		shouldAskToUpdateAccessToken := false
-		if (FlagAccessToken != "") {
+		if FlagAccessToken != "" {
 			accessToken = FlagAccessToken
 			shouldAskToUpdateAccessToken = true
+		}
+
+		groupId := conf.GroupId
+		shouldAskToUpdateGroupId := false
+		if FlagGroupId != "" {
+			groupId = FlagGroupId
+			shouldAskToUpdateGroupId = true
 		}
 
 		err = glab.Initialize(accessToken)
@@ -69,7 +79,7 @@ var listCmd = &cobra.Command{
 			flagUsernames = strings.Split(FlagUsernamesRaw, ",")
 		}
 
-		allMrs, err := fetchMergeRequests(conf, &DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
+		allMrs, err := fetchMergeRequests(conf, groupId, &DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
 		if err != nil {
 			log.Fatalf("Failed to fetch merge requests: %v", err)
 		}
@@ -88,15 +98,22 @@ var listCmd = &cobra.Command{
 				config.Update(files.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
 			}
 		}
+
+		if shouldAskToUpdateGroupId {
+			response := utils.AskBinaryQuestion("Do you want to use the same group ID in the future? (yes/no): ")
+			if strings.HasPrefix(strings.ToLower(response), "y") {
+				config.Update(files.MacglabConfigUrl, "GROUP_ID", FlagGroupId)
+			}
+		}
 	},
 }
 
-func fetchMergeRequests(conf *config.Config, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
+func fetchMergeRequests(conf *config.Config, groupId string, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*GroupFlag && !*ProjectsFlag) || *GroupFlag {
 		usernames := chooseUsernames(flagUsernames, conf.Usernames)
-		groupMrs, err := mrs.FetchGroupMergeRequests(conf.GroupId, usernames, DraftFlag)
+		groupMrs, err := mrs.FetchGroupMergeRequests(groupId, usernames, DraftFlag)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +139,7 @@ func fetchMergeRequests(conf *config.Config, DraftFlag, GroupFlag, ProjectsFlag 
 	allMrs = dedupeMergeRequests(allMrs)
 
 	if !ApprovedFlag && conf.Me != 0 {
-		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(conf, allMrs)
+		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(conf, groupId, allMrs)
 		if err != nil {
 			return nil, err
 		}
@@ -155,8 +172,8 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	return result
 }
 
-func excludeMrsApprovedByMe(conf *config.Config, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
-	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(conf.GroupId, conf.Me, &DraftFlag)
+func excludeMrsApprovedByMe(conf *config.Config, groupId string, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(groupId, conf.Me, &DraftFlag)
 	if err != nil {
 		return nil, err
 	}
