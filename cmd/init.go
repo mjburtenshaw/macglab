@@ -39,9 +39,9 @@ var initCmd = &cobra.Command{
 
 		if isNewInstall {
 			log.Println("macglab: making a new config file...")
-            if err := config.Create(files.SampleConfigUrl, files.MacglabConfigUrl); err != nil {
-                log.Fatalf("macglab: couldn't add config: %s", err)
-            }
+			if err := config.Create(files.SampleConfigUrl, files.MacglabConfigUrl); err != nil {
+				log.Fatalf("macglab: couldn't add config: %s", err)
+			}
 		}
 
 		log.Println("macglab: successfully installed!")
