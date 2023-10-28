@@ -16,7 +16,7 @@ type Config struct {
 	Usernames   []string            `yaml:"USERNAMES"`
 }
 
-func Get(configUrl string) (*Config, error) {
+func Read(configUrl string) (*Config, error) {
 	if err := CheckFileExists(configUrl); err != nil {
 		return nil, fmt.Errorf("couldn't find %s: %w", configUrl, err)
 	}
@@ -34,7 +34,7 @@ func Get(configUrl string) (*Config, error) {
 	return config, nil
 }
 
-func AddConfig(sampleConfigUrl string, configUrl string) (err error) {
+func Create(sampleConfigUrl string, configUrl string) (err error) {
 	sampleConfig, err := os.Open(sampleConfigUrl)
 	if err != nil {
 		return fmt.Errorf("couldn't open sample config: %s", err)
@@ -62,7 +62,7 @@ func AddConfig(sampleConfigUrl string, configUrl string) (err error) {
 	return nil
 }
 
-func ChangeConfig(configUrl string, key string, nextValue string) (err error) {
+func Update(configUrl string, key string, nextValue string) (err error) {
 	configFile, err := os.OpenFile(configUrl, os.O_RDWR, 0)
 	if err != nil {
 		return fmt.Errorf("couldn't open config file: %w", err)
