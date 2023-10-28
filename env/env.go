@@ -9,8 +9,8 @@ import (
 	"github.com/mjburtenshaw/macglab/files"
 )
 
-func AddEnv(shConfigUrl string) (err error) { 
-    if didAddEnv, err := checkAddEnv(shConfigUrl); err != nil {
+func Create(shConfigUrl string) (err error) { 
+    if didAddEnv, err := check(shConfigUrl); err != nil {
         return fmt.Errorf("couldn't check %s for environment variables: %w", shConfigUrl, err)
     } else if didAddEnv {
         return nil  // We already did the stuff below. Exit early.
@@ -39,7 +39,7 @@ func AddEnv(shConfigUrl string) (err error) {
     return nil
 }
 
-func checkAddEnv(shConfigUrl string) (didAddEnv bool, err error) {
+func check(shConfigUrl string) (didAddEnv bool, err error) {
     if err := files.CheckFileExists(shConfigUrl); err != nil {
         return false, fmt.Errorf("couldn't find %s: %w", shConfigUrl, err)
     }
