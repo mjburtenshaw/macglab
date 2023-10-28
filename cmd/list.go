@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mjburtenshaw/macglab/config"
+	"github.com/mjburtenshaw/macglab/files"
 	"github.com/mjburtenshaw/macglab/glab"
 	"github.com/mjburtenshaw/macglab/mrs"
 	"github.com/mjburtenshaw/macglab/utils"
@@ -45,7 +46,7 @@ var listCmd = &cobra.Command{
 	- Use the '-t, --access-token' flag to override the configured access token.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		conf, err := config.Read(config.MacglabConfigUrl)
+		conf, err := config.Read(files.MacglabConfigUrl)
 		if err != nil {
 			log.Fatalf("Failed to read config: %v", err)
 		}
@@ -84,7 +85,7 @@ var listCmd = &cobra.Command{
 		if shouldAskToUpdateAccessToken {
 			response := utils.AskBinaryQuestion("Do you want to use the same access token in the future? (yes/no): ")
 			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(config.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
+				config.Update(files.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
 			}
 		}
 	},

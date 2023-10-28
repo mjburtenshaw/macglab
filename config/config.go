@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/mjburtenshaw/macglab/files"
 	"gopkg.in/yaml.v2"
 )
 
@@ -17,7 +18,7 @@ type Config struct {
 }
 
 func Read(configUrl string) (*Config, error) {
-	if err := CheckFileExists(configUrl); err != nil {
+	if err := files.CheckFileExists(configUrl); err != nil {
 		return nil, fmt.Errorf("couldn't find %s: %w", configUrl, err)
 	}
 
