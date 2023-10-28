@@ -7,10 +7,10 @@ import (
 )
 
 var (
-	HomeUri			string
+	HomeUri          string
 	MacglabConfigUrl string
-	MacglabUri  string
-	ShConfigUrl string
+	MacglabUri       string
+	ShConfigUrl      string
 )
 
 func init() {
@@ -30,11 +30,11 @@ func init() {
 }
 
 func CheckFileExists(fileUrl string) error {
-    info, err := os.Stat(fileUrl)
-    if err != nil {
-        return fmt.Errorf("%s doesn't exist: %w", fileUrl, err)
-    } else if info.IsDir() {
-        return fmt.Errorf("%s exists but is a directory", fileUrl)
-    }
-    return nil
+	info, err := os.Stat(fileUrl)
+	if err != nil {
+		return fmt.Errorf("%s doesn't exist: %w", fileUrl, err)
+	} else if info.IsDir() {
+		return fmt.Errorf("%s exists but is a directory", fileUrl)
+	}
+	return nil
 }
