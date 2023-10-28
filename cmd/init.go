@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/mjburtenshaw/macglab/config"
+	"github.com/mjburtenshaw/macglab/env"
 	"github.com/mjburtenshaw/macglab/files"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +32,7 @@ var initCmd = &cobra.Command{
 			}
 
 			log.Println("macglab: adding environment variables...")
-			if err := config.AddEnv(files.ShConfigUrl); err != nil {
+			if err := env.AddEnv(files.ShConfigUrl); err != nil {
 				log.Fatalf("macglab: couldn't add environment variables: %s", err)
 			}
 		}

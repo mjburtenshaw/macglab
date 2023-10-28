@@ -1,10 +1,12 @@
-package config
+package env
 
 import (
 	"fmt"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/mjburtenshaw/macglab/files"
 )
 
 func AddEnv(shConfigUrl string) (err error) { 
@@ -38,7 +40,7 @@ func AddEnv(shConfigUrl string) (err error) {
 }
 
 func checkAddEnv(shConfigUrl string) (didAddEnv bool, err error) {
-    if err := CheckFileExists(shConfigUrl); err != nil {
+    if err := files.CheckFileExists(shConfigUrl); err != nil {
         return false, fmt.Errorf("couldn't find %s: %w", shConfigUrl, err)
     }
 
