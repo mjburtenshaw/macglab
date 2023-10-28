@@ -47,20 +47,6 @@ func read(configUrl string) error {
 	return err
 }
 
-func DemandConfigDir() error {
-    info, err := os.Stat(MacglabUri)
-    if err != nil {
-        if os.IsNotExist(err) {
-            err = os.MkdirAll(MacglabUri, 0755)
-            return err
-        }
-        return err
-    } else if !info.IsDir() {
-        return fmt.Errorf("%s exists but is not a directory", MacglabUri)
-    }
-    return nil
-}
-
 func AddConfig(sampleConfigUrl string, configUrl string) (err error) {
     sampleConfig, err := os.Open(sampleConfigUrl)
     if err != nil {

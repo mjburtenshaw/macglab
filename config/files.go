@@ -39,3 +39,17 @@ func CheckFileExists(fileUrl string) error {
 	}
 	return nil
 }
+
+func DemandDir(path string) error {
+	info, err := os.Stat(path)
+	if err != nil {
+			if os.IsNotExist(err) {
+					err = os.MkdirAll(path, 0755)
+					return err
+			}
+			return err
+	} else if !info.IsDir() {
+			return fmt.Errorf("%s exists but is not a directory", path)
+	}
+	return nil
+}

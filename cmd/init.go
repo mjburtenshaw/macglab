@@ -25,7 +25,7 @@ var initCmd = &cobra.Command{
 			isNewInstall = true
 
 			log.Println("macglab: demanding a home directory for macglab...")
-			if err := config.DemandConfigDir(); err != nil {
+			if err := config.DemandDir(config.MacglabUri); err != nil {
 				log.Fatalf("macglab: couldn't create macglab config directory: %s", err)
 			}
 
