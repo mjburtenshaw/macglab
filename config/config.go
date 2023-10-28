@@ -25,26 +25,21 @@ var (
 	Usernames   []string
 )
 
-func Get(configUrl string) (*Config, error) {
-    if err := read(configUrl); err != nil {
-        return nil, fmt.Errorf("couldn't get config at %s: %w", configUrl, err)
-    }
-    return config, nil
-}
-
-func read(configUrl string) error {
+func GetConfig(configUrl string) (*Config, error) {
     if err := CheckFileExists(configUrl); err != nil {
-        return fmt.Errorf("couldn't find %s: %w", configUrl, err)
+        return nil, fmt.Errorf("couldn't find %s: %w", configUrl, err)
     }
 
 	configFile, err := os.ReadFile(configUrl)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("couldn't read %s: %w", configUrl, err)
 	}
 
-	err = yaml.Unmarshal(configFile, &config)
+	if err = yaml.Unmarshal(configFile, &config); err != nil {
+        return nil, fmt.Errorf("couldn't unmarshal %s: %w", configUrl, err)
+    }
 
-	return err
+    return config, nil
 }
 
 func AddConfig(sampleConfigUrl string, configUrl string) (err error) {

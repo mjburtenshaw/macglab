@@ -45,7 +45,7 @@ var listCmd = &cobra.Command{
 	- Use the '-t, --access-token' flag to override the configured access token.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		conf, err := config.Get(config.MacglabConfigUrl)
+		conf, err := config.GetConfig(config.MacglabConfigUrl)
 		if err != nil {
 			log.Fatalf("Failed to read config: %v", err)
 		}
