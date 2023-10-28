@@ -88,3 +88,42 @@ func AddConfig(sampleConfigUrl string, configUrl string) (err error) {
 
     return nil
 }
+
+func UpdateConfig(configUrl string, key string, nextValue string) (err error) {
+	configFile, err := os.OpenFile(configUrl, os.O_RDWR, 0)
+    if err != nil {
+        return fmt.Errorf("couldn't open config file: %w", err)
+    }
+	defer func() {
+        if cerr := configFile.Close(); cerr != nil && err == nil {
+            err = fmt.Errorf("couldn't close config file: %s", cerr)
+        }
+    }()
+
+	data, err := io.ReadAll(configFile)
+	if err != nil {
+		return fmt.Errorf("couldn't read config file: %w", err)
+	}
+
+	var content map[interface{}]interface{}
+	if err = yaml.Unmarshal(data, &content); err != nil {
+        return fmt.Errorf("couldn't unmarshal config file: %w", err)
+	}
+
+	if _, ok := content[key]; ok {
+		content[key] = nextValue
+	} else {
+        return fmt.Errorf("invalid key: %s", key)
+	}
+
+	output, err := yaml.Marshal(content)
+	if err != nil {
+        return fmt.Errorf("couldn't marshal config file: %w", err)
+	}
+
+	if err = os.WriteFile(configUrl, output, 0644); err != nil {
+		return fmt.Errorf("couldn't update config file: %w", err)
+	}
+
+    return nil
+}

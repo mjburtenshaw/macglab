@@ -7,6 +7,7 @@ import (
 	"github.com/mjburtenshaw/macglab/config"
 	"github.com/mjburtenshaw/macglab/glab"
 	"github.com/mjburtenshaw/macglab/mrs"
+	"github.com/mjburtenshaw/macglab/utils"
 	"github.com/spf13/cobra"
 	"github.com/xanzy/go-gitlab"
 )
@@ -17,6 +18,7 @@ var (
 	DraftFlag        bool
 	GroupFlag        bool
 	ProjectsFlag     bool
+	FlagAccessToken	 string
 	FlagUsernamesRaw string
 )
 
@@ -27,6 +29,7 @@ func init() {
 	listCmd.PersistentFlags().BoolVarP(&DraftFlag, "draft", "d", false, "Filter output to include draft merge requests.")
 	listCmd.PersistentFlags().BoolVarP(&GroupFlag, "group", "g", false, "Filter output to the usernames configuration.")
 	listCmd.PersistentFlags().BoolVarP(&ProjectsFlag, "projects", "p", false, "Filter output to the projects configuration.")
+	listCmd.PersistentFlags().StringVarP(&FlagAccessToken, "access-token", "t", "", "Override the configured access token.")
 	listCmd.PersistentFlags().StringVarP(&FlagUsernamesRaw, "users", "u", "", "Filter output to the specified usernames.")
 }
 
@@ -39,6 +42,7 @@ var listCmd = &cobra.Command{
 	- Use the '-d, --drafts' flag to include draft MRs.
 	- Use the '-g, --group' flag to filter output to the usernames configuration.
 	- Use the '-p, --projects' flag to filter output to the projects configuration.
+	- Use the '-t, --access-token' flag to override the configured access token.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.Get(config.MacglabConfigUrl)
@@ -47,6 +51,11 @@ var listCmd = &cobra.Command{
 		}
 
 		accessToken := conf.AccessToken
+		shouldAskToUpdateAccessToken := false
+		if (FlagAccessToken != "") {
+			accessToken = FlagAccessToken
+			shouldAskToUpdateAccessToken = true
+		}
 
 		err = glab.Initialize(accessToken)
 		if err != nil {
@@ -69,6 +78,13 @@ var listCmd = &cobra.Command{
 		if BrowserFlag {
 			if err := mrs.OpenMergeRequests(allMrs); err != nil {
 				log.Printf("Failed to open merge requests in the browser: %v", err)
+			}
+		}
+
+		if shouldAskToUpdateAccessToken {
+			response := utils.AskBinaryQuestion("Do you want to use the same access token in the future? (yes/no): ")
+			if strings.HasPrefix(strings.ToLower(response), "y") {
+				config.UpdateConfig(config.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
 			}
 		}
 	},
