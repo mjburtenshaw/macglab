@@ -3,7 +3,6 @@ package cmd
 import (
 	"log"
 	"os"
-	"os/exec"
 
 	"github.com/mjburtenshaw/macglab/config"
 	"github.com/spf13/cobra"
@@ -38,11 +37,9 @@ var initCmd = &cobra.Command{
 
 		if isNewInstall {
 			log.Println("macglab: making a new config file...")
-			cmd := exec.Command("cp", "config.sample.yml", config.MacglabConfigUrl)
-			err := cmd.Run()
-			if err != nil {
-				log.Fatalf("macglab: couldn't create macglab config file: %s", err)
-			}
+            if err := config.AddConfig(config.SampleConfigUrl, config.MacglabConfigUrl); err != nil {
+                log.Fatalf("macglab: couldn't add config: %s", err)
+            }
 		}
 
 		log.Println("macglab: 🎉 Successfully installed!")

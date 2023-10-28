@@ -118,3 +118,31 @@ func checkAddEnv(shConfigUrl string) (didAddEnv bool, err error) {
 
     return false, nil
 }
+
+func AddConfig(sampleConfigUrl string, configUrl string) (err error) {
+    sampleConfig, err := os.Open(sampleConfigUrl)
+    if err != nil {
+        return fmt.Errorf("couldn't open sample config: %s", err)
+    }
+    defer func() {
+        if cerr := sampleConfig.Close(); cerr != nil && err == nil {
+            err = fmt.Errorf("couldn't close sample config: %s", cerr)
+        }
+    }()
+
+    configFile, err := os.Create(configUrl)
+    if err != nil {
+        return fmt.Errorf("couldn't create config: %s", err)
+    }
+    defer func() {
+        if cerr := configFile.Close(); cerr != nil && err == nil {
+            err = fmt.Errorf("couldn't close config: %s", cerr)
+        }
+    }()
+
+    if _, err = io.Copy(configFile, sampleConfig); err != nil {
+        return fmt.Errorf("couldn't copy config: %s", err)
+    }
+
+    return nil
+}

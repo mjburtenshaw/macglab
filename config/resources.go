@@ -11,6 +11,7 @@ var (
 	MacglabConfigUrl string
 	MacglabUri       string
 	ShConfigUrl      string
+	SampleConfigUrl  = "config.sample.yml"
 )
 
 func init() {
