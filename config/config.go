@@ -70,7 +70,7 @@ func AddConfig(sampleConfigUrl string, configUrl string) (err error) {
     return nil
 }
 
-func UpdateConfig(configUrl string, key string, nextValue string) (err error) {
+func ChangeConfig(configUrl string, key string, nextValue string) (err error) {
 	configFile, err := os.OpenFile(configUrl, os.O_RDWR, 0)
     if err != nil {
         return fmt.Errorf("couldn't open config file: %w", err)

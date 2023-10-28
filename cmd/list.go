@@ -84,7 +84,7 @@ var listCmd = &cobra.Command{
 		if shouldAskToUpdateAccessToken {
 			response := utils.AskBinaryQuestion("Do you want to use the same access token in the future? (yes/no): ")
 			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.UpdateConfig(config.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
+				config.ChangeConfig(config.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
 			}
 		}
 	},
