@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type TConfig struct {
+type Config struct {
 	AccessToken string              `yaml:"ACCESS_TOKEN"`
 	GroupId     string              `yaml:"GROUP_ID"`
 	Me          int                 `yaml:"ME"`
@@ -16,9 +16,7 @@ type TConfig struct {
 	Usernames   []string            `yaml:"USERNAMES"`
 }
 
-var Config *TConfig
-
-func GetConfig(configUrl string) (*TConfig, error) {
+func Get(configUrl string) (*Config, error) {
 	if err := CheckFileExists(configUrl); err != nil {
 		return nil, fmt.Errorf("couldn't find %s: %w", configUrl, err)
 	}
@@ -28,11 +26,12 @@ func GetConfig(configUrl string) (*TConfig, error) {
 		return nil, fmt.Errorf("couldn't read %s: %w", configUrl, err)
 	}
 
-	if err = yaml.Unmarshal(configFile, &Config); err != nil {
+	var config *Config
+	if err = yaml.Unmarshal(configFile, &config); err != nil {
 		return nil, fmt.Errorf("couldn't unmarshal %s: %w", configUrl, err)
 	}
 
-	return Config, nil
+	return config, nil
 }
 
 func AddConfig(sampleConfigUrl string, configUrl string) (err error) {

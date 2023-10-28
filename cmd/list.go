@@ -90,7 +90,7 @@ var listCmd = &cobra.Command{
 	},
 }
 
-func fetchMergeRequests(conf *config.TConfig, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
+func fetchMergeRequests(conf *config.Config, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*GroupFlag && !*ProjectsFlag) || *GroupFlag {
@@ -154,7 +154,7 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	return result
 }
 
-func excludeMrsApprovedByMe(conf *config.TConfig, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+func excludeMrsApprovedByMe(conf *config.Config, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
 	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(conf.GroupId, conf.Me, &DraftFlag)
 	if err != nil {
 		return nil, err
