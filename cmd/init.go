@@ -44,7 +44,7 @@ var initCmd = &cobra.Command{
             }
 		}
 
-		log.Println("macglab: 🎉 Successfully installed!")
+		log.Println("macglab: successfully installed!")
 
 		if isNewInstall {
 			log.Printf("macglab: created a new config file at %s. Please open it and define values.\n", files.MacglabConfigUrl)
