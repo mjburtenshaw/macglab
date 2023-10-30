@@ -10,11 +10,11 @@ import (
 )
 
 type Config struct {
-	AccessToken string              `yaml:"ACCESS_TOKEN"`
-	GroupId     string              `yaml:"GROUP_ID"`
-	Me          int                 `yaml:"ME"`
-	Projects    map[string][]string `yaml:"PROJECTS"`
-	Usernames   []string            `yaml:"USERNAMES"`
+	AccessToken string              `yaml:"access_token"`
+	GroupId     string              `yaml:"group_id"`
+	Me          int                 `yaml:"me"`
+	Projects    map[string][]string `yaml:"projects"`
+	Usernames   []string            `yaml:"usernames"`
 }
 
 func Read(configUrl string) (*Config, error) {

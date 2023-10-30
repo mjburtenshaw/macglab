@@ -28,12 +28,12 @@ var (
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.PersistentFlags().BoolVarP(&ApprovedFlag, "approved", "a", false, "Filter output to include MRs approved by the configured ME user ID.")
+	listCmd.PersistentFlags().BoolVarP(&ApprovedFlag, "approved", "a", false, "Filter output to include MRs approved by the configured me user ID.")
 	listCmd.PersistentFlags().BoolVarP(&BrowserFlag, "browser", "b", false, "Open merge requests in the browser.")
 	listCmd.PersistentFlags().BoolVarP(&DraftFlag, "draft", "d", false, "Filter output to include draft merge requests.")
 	listCmd.PersistentFlags().BoolVarP(&GroupFlag, "group", "g", false, "Filter output to the usernames configuration.")
 	listCmd.PersistentFlags().StringVarP(&FlagGroupId, "group-id", "i", "", "Override the configured groud ID.")
-	listCmd.PersistentFlags().IntVarP(&FlagMe, "me", "m", 0, "Override the configured ME user ID.")
+	listCmd.PersistentFlags().IntVarP(&FlagMe, "me", "m", 0, "Override the configured me user ID.")
 	listCmd.PersistentFlags().BoolVarP(&ProjectsFlag, "projects", "p", false, "Filter output to the projects configuration.")
 	listCmd.PersistentFlags().StringVarP(&FlagAccessToken, "access-token", "t", "", "Override the configured access token.")
 	listCmd.PersistentFlags().StringVarP(&FlagUsernamesRaw, "users", "u", "", "Filter output to the specified usernames.")
@@ -43,12 +43,12 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List merge requests",
 	Long: `List merge requests using the following options:
-	- Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'ME' user ID.
+	- Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'me' user ID.
 	- Use the '-b, --browser' flag to open MRs in the browser.
 	- Use the '-d, --drafts' flag to include draft MRs.
 	- Use the '-g, --group' flag to filter output to the usernames configuration.
 	- Use the '-i, --group-id' flag to override the configured group ID.
-	- Use the '-m, --me' flag to override the configured ME user ID.
+	- Use the '-m, --me' flag to override the configured me user ID.
 	- Use the '-p, --projects' flag to filter output to the projects configuration.
 	- Use the '-t, --access-token' flag to override the configured access token.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
@@ -106,21 +106,21 @@ var listCmd = &cobra.Command{
 		if shouldAskToUpdateAccessToken {
 			response := utils.AskBinaryQuestion("Do you want to use the same access token in the future? (yes/no): ")
 			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(files.MacglabConfigUrl, "ACCESS_TOKEN", FlagAccessToken)
+				config.Update(files.MacglabConfigUrl, "access_token", FlagAccessToken)
 			}
 		}
 
 		if shouldAskToUpdateGroupId {
 			response := utils.AskBinaryQuestion("Do you want to use the same group ID in the future? (yes/no): ")
 			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(files.MacglabConfigUrl, "GROUP_ID", FlagGroupId)
+				config.Update(files.MacglabConfigUrl, "group_id", FlagGroupId)
 			}
 		}
 
 		if shouldAskToUpdateMe {
-			response := utils.AskBinaryQuestion("Do you want to use the same ME user ID in the future? (yes/no): ")
+			response := utils.AskBinaryQuestion("Do you want to use the same me user ID in the future? (yes/no): ")
 			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(files.MacglabConfigUrl, "ME", fmt.Sprintf("%d", FlagMe))
+				config.Update(files.MacglabConfigUrl, "me", fmt.Sprintf("%d", FlagMe))
 			}
 		}
 	},
