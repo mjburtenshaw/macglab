@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"bufio"
-	"fmt"
 	"log"
 	"os"
-	"os/exec"
 
+	"github.com/mjburtenshaw/macglab/config"
+	"github.com/mjburtenshaw/macglab/env"
+	"github.com/mjburtenshaw/macglab/files"
 	"github.com/spf13/cobra"
 )
 
@@ -19,77 +19,36 @@ var initCmd = &cobra.Command{
 	Short: "Initializes macglab",
 	Long:  `Initializes macglab`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("macglab: 🏗️  Installing macglab...")
-
-		homeUri := os.Getenv("HOME")
-		goPath := os.Getenv("GOPATH")
-
-		if homeUri == "" {
-			log.Fatal("macglab: 🏚️ Couldn't find HOME environment variable.")
-		}
-
-		if goPath == "" {
-			log.Fatal("macglab: 🏚️ Couldn't find GOPATH environment variable.")
-		}
-
-		macglabUri := fmt.Sprintf("%s/.macglab", homeUri)
+		log.Println("macglab: installing macglab...")
 
 		isNewInstall := false
-		if _, err := os.Stat(macglabUri); os.IsNotExist(err) {
-			fmt.Println("macglab: 🆕 No previous installation detected. *cracks knuckles* Starting from scratch...")
+		if _, err := os.Stat(files.MacglabUri); os.IsNotExist(err) {
+			log.Println("macglab: no previous installation detected. *cracks knuckles* Starting from scratch...")
 			isNewInstall = true
 
-			fmt.Println("macglab: 🏠 Making home directory for macglab...")
-			cmd := exec.Command("mkdir", macglabUri)
-			err := cmd.Run()
-			if err != nil {
-				log.Fatal("macglab: 💀 Couldn't create macglab config directory.")
+			log.Println("macglab: demanding a home directory for macglab...")
+			if err := files.DemandDir(files.MacglabUri); err != nil {
+				log.Fatalf("macglab: couldn't create macglab config directory: %s", err)
 			}
 
-			fmt.Println("macglab: 🐚 Adding environment variables...")
-			shConfigUrl := fmt.Sprintf("%s/.zshrc", homeUri)
-			shConfig, err := os.OpenFile(shConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
-			if err != nil {
-				log.Fatal("macglab: 💀 Couldn't write to shell config file.")
-			}
-			defer shConfig.Close()
-
-			writer := bufio.NewWriter(shConfig)
-
-			lines := []string{
-				"",
-				"# [`macglab`](https://github.com/mjburtenshaw/macglab)",
-				"",
-				`export MACGLAB="${HOME}/.macglab"`,
-				`export PATH="${GOPATH}/bin/macglab:${PATH}"`,
-				"",
-			}
-
-			for _, line := range lines {
-				_, err := writer.WriteString(line + "\n")
-				if err != nil {
-					log.Fatal("macglab: 💀 Couldn't write line to shell config file.")
-				}
-			}
-
-			writer.Flush()
-		}
-
-		macglabConfigUrl := fmt.Sprintf("%s/config.yml", macglabUri)
-		if isNewInstall {
-			fmt.Println("macglab: 📜 Making a new config file...")
-			cmd := exec.Command("cp", "config.sample.yml", macglabConfigUrl)
-			err := cmd.Run()
-			if err != nil {
-				log.Fatal("macglab: 💀 Couldn't create macglab config file.")
+			log.Println("macglab: adding environment variables...")
+			if err := env.Update(files.ShConfigUrl); err != nil {
+				log.Fatalf("macglab: couldn't add environment variables: %s", err)
 			}
 		}
 
-		fmt.Println("macglab: 🎉 Successfully installed!")
+		if isNewInstall {
+			log.Println("macglab: making a new config file...")
+			if err := config.Create(files.SampleConfigUrl, files.MacglabConfigUrl); err != nil {
+				log.Fatalf("macglab: couldn't add config: %s", err)
+			}
+		}
+
+		log.Println("macglab: successfully installed!")
 
 		if isNewInstall {
-			fmt.Printf("macglab: 📜 Created a new config file at %s. Please open it and define values.\n", macglabConfigUrl)
-			fmt.Println("macglab: 🐚 Re-source your shell session or open a new terminal, then run `macglab list` and watch the magic happen!")
+			log.Printf("macglab: created a new config file at %s. Please open it and define values.\n", files.MacglabConfigUrl)
+			log.Println("macglab: re-source your shell session or open a new terminal, then run `macglab list` and watch the magic happen!")
 		}
 	},
 }

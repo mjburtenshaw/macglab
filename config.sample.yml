@@ -1,11 +1,11 @@
-ACCESS_TOKEN: <your_access_token_here>
+access_token: <your_access_token_here>
 
-GROUP_ID: <your_group_id_here>
+group_id: <your_group_id_here>
 
-ME: <your_gitlab_user_id_here>
+me: <your_gitlab_user_id_here>
 
 # usernames listed under the "all" entry will apply to every project listed below.
-PROJECTS:
+projects:
     all:
         - username1
     123:
@@ -23,5 +23,5 @@ PROJECTS:
         # projectD
         - username4
 
-USERNAMES:
+usernames:
   - <a_list_of_usernames_here>

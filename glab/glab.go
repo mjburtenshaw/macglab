@@ -2,14 +2,12 @@ package glab
 
 import (
 	"github.com/xanzy/go-gitlab"
-
-	"github.com/mjburtenshaw/macglab/config"
 )
 
 var Client *gitlab.Client
 
-func Initialize() error {
-	client, err := gitlab.NewClient(config.AccessToken)
+func Initialize(accessToken string) error {
+	client, err := gitlab.NewClient(accessToken)
 	if err != nil {
 		return err
 	}

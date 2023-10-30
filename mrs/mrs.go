@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/mjburtenshaw/macglab/config"
 	"github.com/mjburtenshaw/macglab/glab"
 	"github.com/xanzy/go-gitlab"
 )
@@ -49,11 +48,11 @@ func getWIPQueryParamPointer(shouldIncludeDrafts *bool) *string {
 }
 
 // FetchGroupMergeRequests fetches merge requests for a group from GitLab.
-func FetchGroupMergeRequests(usernames []string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+func FetchGroupMergeRequests(groupId string, usernames []string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
 	var groupMrs []*gitlab.MergeRequest
 
 	for _, username := range usernames {
-		userMrs, err := fetchUserMergeRequests(username, shouldIncludeDrafts)
+		userMrs, err := fetchUserMergeRequests(groupId, username, shouldIncludeDrafts)
 		if err != nil {
 			return nil, err
 		}
@@ -64,8 +63,8 @@ func FetchGroupMergeRequests(usernames []string, shouldIncludeDrafts *bool) ([]*
 }
 
 // fetchUserMergeRequests fetches merge requests for a specific user within a group from GitLab.
-func fetchUserMergeRequests(username string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
-	userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
+func fetchUserMergeRequests(groupId string, username string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	userMrs, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(groupId, &gitlab.ListGroupMergeRequestsOptions{
 		AuthorUsername: gitlab.String(username),
 		State:          gitlab.String("opened"),
 		WIP:            getWIPQueryParamPointer(shouldIncludeDrafts),
@@ -115,8 +114,8 @@ func OpenMergeRequests(mrs []*gitlab.MergeRequest) error {
 	return nil
 }
 
-func GetMergeRequestsApprovedByMe(myId int, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
-	mrsApprovedByMe, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(config.GroupId, &gitlab.ListGroupMergeRequestsOptions{
+func GetMergeRequestsApprovedByMe(groupId string, myId int, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	mrsApprovedByMe, _, err := glab.Client.MergeRequests.ListGroupMergeRequests(groupId, &gitlab.ListGroupMergeRequestsOptions{
 		ApprovedByIDs: gitlab.ApproverIDs([]int{myId}),
 		State:         gitlab.String("opened"),
 		WIP:           getWIPQueryParamPointer(shouldIncludeDrafts),

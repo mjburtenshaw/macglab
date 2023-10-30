@@ -8,7 +8,7 @@ This program lists all GitLab Merge Requests (MRs) based on:
 - Specified usernames and/or projects
 - Specified group
 
-![Static Badge](https://img.shields.io/badge/version-3.1.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-4.0.0-66023c)
 
 Table of Contents
 ------------------
@@ -19,11 +19,11 @@ Table of Contents
     - [Requirements](#requirements)
     - [Updating](#updating)
 - [Configuration](#configuration)
-    - [`ACCESS_TOKEN`](#access_token)
-    - [`GROUP_ID`](#group_id)
-    - [`ME`](#me)
-    - [`USERNAMES`](#usernames)
-    - [`PROJECTS`](#projects)
+    - [`access_token`](#access_token)
+    - [`group_id`](#group_id)
+    - [`me`](#me)
+    - [`usernames`](#usernames)
+    - [`projects`](#projects)
 - [See Also](#see-also)
 
 Usage
@@ -32,11 +32,14 @@ Usage
 ### List
 
 Run `macglab list` in a shell:
-- Use the `-a, --approved` flag to filter output to include MRs approved by [the configured `ME`](#me) user ID.
+- Use the `-a, --approved` flag to filter output to include MRs approved by [the configured `me`](#me) user ID.
 - Use the `-b, --browser` flag to open MRs in the browser.
 - Use the `-d, --drafts` flag to include draft MRs.
 - Use the `-g, --group` flag to filter output to [the usernames configuration](#usernames).
+- Use the `-i, --group-id` flag to override [the configured group ID](#group_id).
+- Use the `-m, --me` flag to override [the configured `me`](#me) user ID.
 - Use the `-p, --projects` flag to filter output to [the projects configuration](#projects).
+- Use the `-t, --access-token` flag to override the configured access token.
 - Use the `-u, --users` flag to override [configured usernames](#usernames) and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
 
 ```sh
@@ -86,30 +89,30 @@ Configuration
 
 See [the sample config](/config.sample.yml) for a full example.
 
-### `ACCESS_TOKEN`
+### `access_token`
 
 A GitLab personal access token[^1].
 
-### `GROUP_ID`
+### `group_id`
 
 A GitLab group ID[^2].
 
-### `ME`
+### `me`
 
 Your GitLab user ID (though it doesn't *have* to be yours). It's used to filter MRs based on approval.
 
-### `USERNAMES`
+### `usernames`
 
 A list of GitLab usernames in the group you wish to follow.
 
-### `PROJECTS`
+### `projects`
 
 A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
 
 ```yaml
 # usernames listed under the "all" entry will apply to every project listed below.
 
-PROJECTS:
+projects:
     all:
         - username1
     123:
