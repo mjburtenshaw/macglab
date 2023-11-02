@@ -79,15 +79,15 @@ var listCmd = &cobra.Command{
 			shouldAskToUpdateMe = true
 		}
 
-		err = glab.Initialize(accessToken)
-		if err != nil {
-			log.Fatalf("Failed to initialize gitlab client: %v", err)
-		}
-
 		FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
 		var flagUsernames []string
 		if FlagUsernamesRaw != "" {
 			flagUsernames = strings.Split(FlagUsernamesRaw, ",")
+		}
+
+		err = glab.Initialize(accessToken)
+		if err != nil {
+			log.Fatalf("Failed to initialize gitlab client: %v", err)
 		}
 
 		allMrs, err := fetchMergeRequests(conf, groupId, me, &DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
