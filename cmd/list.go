@@ -22,7 +22,7 @@ var (
 	ProjectsFlag     bool
 	FlagAccessToken  string
 	FlagGroupId      string
-	FlagMe      		 int
+	FlagMe           int
 	FlagUsernamesRaw string
 )
 
@@ -58,32 +58,7 @@ var listCmd = &cobra.Command{
 			log.Fatalf("Failed to read config: %v", err)
 		}
 
-		accessToken := conf.AccessToken
-		shouldAskToUpdateAccessToken := false
-		if FlagAccessToken != "" {
-			accessToken = FlagAccessToken
-			shouldAskToUpdateAccessToken = true
-		}
-
-		groupId := conf.GroupId
-		shouldAskToUpdateGroupId := false
-		if FlagGroupId != "" {
-			groupId = FlagGroupId
-			shouldAskToUpdateGroupId = true
-		}
-
-		me := conf.Me
-		shouldAskToUpdateMe := false
-		if FlagMe != 0 {
-			me = FlagMe
-			shouldAskToUpdateMe = true
-		}
-
-		FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
-		var flagUsernames []string
-		if FlagUsernamesRaw != "" {
-			flagUsernames = strings.Split(FlagUsernamesRaw, ",")
-		}
+		accessToken, groupId, me, flagUsernames, shouldAskToUpdateAccessToken, shouldAskToUpdateGroupId, shouldAskToUpdateMe := parseFlags(conf)
 
 		err = glab.Initialize(accessToken)
 		if err != nil {
@@ -124,6 +99,36 @@ var listCmd = &cobra.Command{
 			}
 		}
 	},
+}
+
+func parseFlags(conf *config.Config) (accessToken string, groupId string, me int, flagUsernames []string, shouldAskToUpdateAccessToken bool, shouldAskToUpdateGroupId bool, shouldAskToUpdateMe bool) {
+	accessToken = conf.AccessToken
+	shouldAskToUpdateAccessToken = false
+	if FlagAccessToken != "" {
+		accessToken = FlagAccessToken
+		shouldAskToUpdateAccessToken = true
+	}
+
+	groupId = conf.GroupId
+	shouldAskToUpdateGroupId = false
+	if FlagGroupId != "" {
+		groupId = FlagGroupId
+		shouldAskToUpdateGroupId = true
+	}
+
+	me = conf.Me
+	shouldAskToUpdateMe = false
+	if FlagMe != 0 {
+		me = FlagMe
+		shouldAskToUpdateMe = true
+	}
+
+	FlagUsernamesRaw = strings.ReplaceAll(FlagUsernamesRaw, " ", "")
+	if FlagUsernamesRaw != "" {
+		flagUsernames = strings.Split(FlagUsernamesRaw, ",")
+	}
+
+	return accessToken, groupId, me, flagUsernames, shouldAskToUpdateAccessToken, shouldAskToUpdateGroupId, shouldAskToUpdateMe
 }
 
 func fetchMergeRequests(conf *config.Config, groupId string, me int, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
