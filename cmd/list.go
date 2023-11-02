@@ -60,12 +60,12 @@ var listCmd = &cobra.Command{
 
 		accessToken, groupId, me, flagUsernames, shouldAskToUpdateAccessToken, shouldAskToUpdateGroupId, shouldAskToUpdateMe := parseFlags(conf)
 
-		err = glab.Initialize(accessToken)
+		glabClient, err := glab.Initialize(accessToken)
 		if err != nil {
 			log.Fatalf("Failed to initialize gitlab client: %v", err)
 		}
 
-		allMrs, err := fetchMergeRequests(conf, groupId, me, &DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
+		allMrs, err := fetchMergeRequests(glabClient, conf, groupId, me, &DraftFlag, &GroupFlag, &ProjectsFlag, flagUsernames)
 		if err != nil {
 			log.Fatalf("Failed to fetch merge requests: %v", err)
 		}
@@ -131,12 +131,12 @@ func parseFlags(conf *config.Config) (accessToken string, groupId string, me int
 	return accessToken, groupId, me, flagUsernames, shouldAskToUpdateAccessToken, shouldAskToUpdateGroupId, shouldAskToUpdateMe
 }
 
-func fetchMergeRequests(conf *config.Config, groupId string, me int, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
+func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, groupId string, me int, DraftFlag, GroupFlag, ProjectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
 	var allMrs []*gitlab.MergeRequest
 
 	if (!*GroupFlag && !*ProjectsFlag) || *GroupFlag {
 		usernames := chooseUsernames(flagUsernames, conf.Usernames)
-		groupMrs, err := mrs.FetchGroupMergeRequests(groupId, usernames, DraftFlag)
+		groupMrs, err := mrs.FetchGroupMergeRequests(glabClient, groupId, usernames, DraftFlag)
 		if err != nil {
 			return nil, err
 		}
@@ -150,7 +150,7 @@ func fetchMergeRequests(conf *config.Config, groupId string, me int, DraftFlag, 
 			if project != "all" {
 				projectUsernames := append(thisProjectUsernames, allProjectUsernames...)
 				usernames := chooseUsernames(flagUsernames, projectUsernames)
-				projectMrs, err := mrs.FetchProjectMergeRequests(project, usernames, DraftFlag)
+				projectMrs, err := mrs.FetchProjectMergeRequests(glabClient, project, usernames, DraftFlag)
 				if err != nil {
 					return nil, err
 				}
@@ -162,7 +162,7 @@ func fetchMergeRequests(conf *config.Config, groupId string, me int, DraftFlag, 
 	allMrs = dedupeMergeRequests(allMrs)
 
 	if !ApprovedFlag && me != 0 {
-		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(groupId, me, allMrs)
+		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(glabClient, groupId, me, allMrs)
 		if err != nil {
 			return nil, err
 		}
@@ -195,8 +195,8 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	return result
 }
 
-func excludeMrsApprovedByMe(groupId string, me int, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
-	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(groupId, me, &DraftFlag)
+func excludeMrsApprovedByMe(glabClient *glab.TGitlabClient, groupId string, me int, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(glabClient, groupId, me, &DraftFlag)
 	if err != nil {
 		return nil, err
 	}
