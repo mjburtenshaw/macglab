@@ -8,7 +8,7 @@ This program lists all GitLab Merge Requests (MRs) based on:
 - Specified usernames and/or projects
 - Specified group
 
-![Static Badge](https://img.shields.io/badge/version-4.0.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-4.1.0-66023c)
 
 Table of Contents
 ------------------
@@ -99,7 +99,9 @@ A GitLab group ID[^2].
 
 ### `me`
 
-Your GitLab user ID (though it doesn't *have* to be yours). It's used to filter MRs based on approval.
+Your GitLab user ID (though it doesn't *have* to be yours). It's used for the following:
+- Filter MRs based on approval.
+- Include MRs where the given user ID is a reviewer.
 
 ### `usernames`
 
