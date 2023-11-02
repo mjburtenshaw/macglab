@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/mjburtenshaw/macglab/files"
+	"github.com/mjburtenshaw/macglab/utils"
 	"gopkg.in/yaml.v2"
 )
 
@@ -15,6 +17,13 @@ type Config struct {
 	Me          int                 `yaml:"me"`
 	Projects    map[string][]string `yaml:"projects"`
 	Usernames   []string            `yaml:"usernames"`
+}
+
+type TrueUpKit struct {
+	ShouldAsk bool
+	Question string
+	ConfigAttr string
+	NextValue string
 }
 
 func Read(configUrl string) (*Config, error) {
@@ -63,7 +72,7 @@ func Create(sampleConfigUrl string, configUrl string) (err error) {
 	return nil
 }
 
-func Update(configUrl string, key string, nextValue string) (err error) {
+func Update(configUrl string, key string, NextValue string) (err error) {
 	configFile, err := os.OpenFile(configUrl, os.O_RDWR, 0)
 	if err != nil {
 		return fmt.Errorf("couldn't open config file: %w", err)
@@ -85,7 +94,7 @@ func Update(configUrl string, key string, nextValue string) (err error) {
 	}
 
 	if _, ok := content[key]; ok {
-		content[key] = nextValue
+		content[key] = NextValue
 	} else {
 		return fmt.Errorf("invalid key: %s", key)
 	}
@@ -100,4 +109,15 @@ func Update(configUrl string, key string, nextValue string) (err error) {
 	}
 
 	return nil
+}
+
+func TrueUp(trueUpKits []TrueUpKit) {
+	for _, trueUpKit := range trueUpKits {
+		if trueUpKit.ShouldAsk {
+			response := utils.AskBinaryQuestion(trueUpKit.Question)
+			if strings.HasPrefix(strings.ToLower(response), "y") {
+				Update(files.MacglabConfigUrl, trueUpKit.ConfigAttr, trueUpKit.NextValue)
+			}
+		}
+	}
 }

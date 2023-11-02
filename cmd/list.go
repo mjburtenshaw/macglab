@@ -9,7 +9,6 @@ import (
 	"github.com/mjburtenshaw/macglab/files"
 	"github.com/mjburtenshaw/macglab/glab"
 	"github.com/mjburtenshaw/macglab/mrs"
-	"github.com/mjburtenshaw/macglab/utils"
 	"github.com/spf13/cobra"
 	"github.com/xanzy/go-gitlab"
 )
@@ -78,26 +77,26 @@ var listCmd = &cobra.Command{
 			}
 		}
 
-		if shouldAskToUpdateAccessToken {
-			response := utils.AskBinaryQuestion("Do you want to use the same access token in the future? (yes/no): ")
-			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(files.MacglabConfigUrl, "access_token", FlagAccessToken)
-			}
-		}
-
-		if shouldAskToUpdateGroupId {
-			response := utils.AskBinaryQuestion("Do you want to use the same group ID in the future? (yes/no): ")
-			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(files.MacglabConfigUrl, "group_id", FlagGroupId)
-			}
-		}
-
-		if shouldAskToUpdateMe {
-			response := utils.AskBinaryQuestion("Do you want to use the same me user ID in the future? (yes/no): ")
-			if strings.HasPrefix(strings.ToLower(response), "y") {
-				config.Update(files.MacglabConfigUrl, "me", fmt.Sprintf("%d", FlagMe))
-			}
-		}
+		config.TrueUp([]config.TrueUpKit{
+			{
+				ShouldAsk:  shouldAskToUpdateAccessToken,
+				Question:   "Do you want to use the same access token in the future? (yes/no): ",
+				ConfigAttr: "access_token",
+				NextValue:  FlagAccessToken,
+			},
+			{
+				ShouldAsk:  shouldAskToUpdateGroupId,
+				Question:   "Do you want to use the same group ID in the future? (yes/no): ",
+				ConfigAttr: "group_id",
+				NextValue:  FlagGroupId,
+			},
+			{
+				ShouldAsk:  shouldAskToUpdateMe,
+				Question:   "Do you want to use the same me user ID in the future? (yes/no): ",
+				ConfigAttr: "me",
+				NextValue:  fmt.Sprintf("%d", FlagMe),
+			},
+		})
 	},
 }
 
