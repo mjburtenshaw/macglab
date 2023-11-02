@@ -170,6 +170,12 @@ func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, gro
 		}
 	}
 
+    mrsInReviewByMe, err := mrs.FetchReviewerMergeRequests(glabClient, groupId, me, draftFlag)
+    if err != nil {
+        return nil, err
+    }
+    allMrs = append(allMrs, mrsInReviewByMe...)
+
 	allMrs = dedupeMergeRequests(allMrs)
 
 	if !approvedFlag && me != 0 {

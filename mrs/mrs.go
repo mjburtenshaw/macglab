@@ -77,6 +77,21 @@ func fetchUserMergeRequests(glabClient *glab.TGitlabClient, groupId string, user
 	return userMrs, nil
 }
 
+// FetchUserMergeRequests fetches merge requests for a specific reviewer within a group from GitLab.
+func FetchReviewerMergeRequests(glabClient *glab.TGitlabClient, groupId string, userId int, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
+	userMrs, _, err := glabClient.MergeRequests.ListGroupMergeRequests(groupId, &gitlab.ListGroupMergeRequestsOptions{
+		ReviewerID: 		gitlab.ReviewerID(userId),
+		State:          gitlab.String("opened"),
+		WIP:            getWIPQueryParamPointer(shouldIncludeDrafts),
+	})
+	if err != nil {
+		log.Printf("Failed to get merge requests for %v: %v\n", userId, err)
+		return nil, err
+	}
+
+	return userMrs, nil
+}
+
 // FetchProjectMergeRequests fetches merge requests for a project from GitLab.
 func FetchProjectMergeRequests(glabClient *glab.TGitlabClient, projectId string, usernames []string, shouldIncludeDrafts *bool) ([]*gitlab.MergeRequest, error) {
 	var projectMrs []*gitlab.MergeRequest
