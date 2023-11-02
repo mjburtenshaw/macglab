@@ -162,7 +162,7 @@ func fetchMergeRequests(conf *config.Config, groupId string, me int, DraftFlag, 
 	allMrs = dedupeMergeRequests(allMrs)
 
 	if !ApprovedFlag && me != 0 {
-		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(conf, groupId, me, allMrs)
+		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(groupId, me, allMrs)
 		if err != nil {
 			return nil, err
 		}
@@ -195,7 +195,7 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	return result
 }
 
-func excludeMrsApprovedByMe(conf *config.Config, groupId string, me int, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+func excludeMrsApprovedByMe(groupId string, me int, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
 	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(groupId, me, &DraftFlag)
 	if err != nil {
 		return nil, err
