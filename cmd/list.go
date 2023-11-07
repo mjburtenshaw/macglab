@@ -25,19 +25,22 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.Read(files.MacglabConfigUrl)
 		if err != nil {
-			log.Fatalf("Failed to read config: %v", err)
+			log.Printf("Failed to read config: %v", err)
+            return
 		}
 
 		listFlags := flags.GetListFlags(conf)
 
 		glabClient, err := glab.Initialize(listFlags.Resolved.AccessToken)
 		if err != nil {
-			log.Fatalf("Failed to initialize gitlab client: %v", err)
+			log.Printf("Failed to initialize gitlab client: %v", err)
+            return
 		}
 
 		allMrs, err := fetchMergeRequests(glabClient, conf, listFlags.Resolved, listFlags.Boolean)
 		if err != nil {
-			log.Fatalf("Failed to fetch merge requests: %v", err)
+			log.Printf("Failed to fetch merge requests: %v", err)
+            return
 		}
 
 		mrs.PrintMergeRequests(allMrs)
