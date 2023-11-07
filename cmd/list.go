@@ -192,7 +192,7 @@ func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, gro
 	if !readyFlag {
 		mrsNotReadyToMerge := []*gitlab.MergeRequest{}
 		for _, mr := range allMrs {
-			if mr.DetailedMergeStatus != "can_be_merged" {
+			if mr.DetailedMergeStatus != "mergeable" {
 				mrsNotReadyToMerge = append(mrsNotReadyToMerge, mr)
 			}
 		}
