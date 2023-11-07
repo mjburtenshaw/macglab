@@ -21,17 +21,7 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List merge requests",
-	Long: `List merge requests using the following options:
-    - Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'me' user ID.
-    - Use the '-b, --browser' flag to open MRs in the browser.
-    - Use the '-d, --drafts' flag to include draft MRs.
-    - Use the '-g, --group' flag to filter output to the usernames configuration.
-    - Use the '-i, --group-id' flag to override the configured group ID.
-    - Use the '-m, --me' flag to override the configured me user ID.
-    - Use the '-p, --projects' flag to filter output to the projects configuration.
-    - Use the '-r, --ready' flag to filter output to include merge requests that are ready to merge.
-    - Use the '-t, --access-token' flag to override the configured access token.
-    - Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
+	Long: flags.DescribeListFlags(),
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.Read(files.MacglabConfigUrl)
 		if err != nil {

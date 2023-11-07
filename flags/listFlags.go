@@ -70,7 +70,7 @@ func AddListFlags(listCmd *cobra.Command) {
 }
 
 func DescribeListFlags() string {
-	return `
+	return `List merge requests using the following options:
     - Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'me' user ID.
     - Use the '-b, --browser' flag to open MRs in the browser.
     - Use the '-d, --drafts' flag to include draft MRs.
