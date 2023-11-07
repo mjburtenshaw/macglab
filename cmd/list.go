@@ -28,6 +28,7 @@ var (
 	draftFlag        bool
 	groupFlag        bool
 	projectsFlag     bool
+	readyFlag		     bool
 	flagAccessToken  string
 	flagGroupId      string
 	flagMe           int
@@ -43,6 +44,7 @@ func init() {
 	listCmd.PersistentFlags().StringVarP(&flagGroupId, "group-id", "i", "", "Override the configured groud ID.")
 	listCmd.PersistentFlags().IntVarP(&flagMe, "me", "m", 0, "Override the configured me user ID.")
 	listCmd.PersistentFlags().BoolVarP(&projectsFlag, "projects", "p", false, "Filter output to the projects configuration.")
+	listCmd.PersistentFlags().BoolVarP(&readyFlag, "ready", "r", false, "Filter output to include merge requests that are ready to merge.")
 	listCmd.PersistentFlags().StringVarP(&flagAccessToken, "access-token", "t", "", "Override the configured access token.")
 	listCmd.PersistentFlags().StringVarP(&flagUsernamesRaw, "users", "u", "", "Filter output to the specified usernames.")
 }
@@ -58,6 +60,7 @@ var listCmd = &cobra.Command{
 	- Use the '-i, --group-id' flag to override the configured group ID.
 	- Use the '-m, --me' flag to override the configured me user ID.
 	- Use the '-p, --projects' flag to filter output to the projects configuration.
+	- Use the '-r, --ready' flag to filter output to include merge requests that are ready to merge.
 	- Use the '-t, --access-token' flag to override the configured access token.
 	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -184,6 +187,16 @@ func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, gro
 			return nil, err
 		}
 		allMrs = mrsNotApprovedByMe
+	}
+
+	if !readyFlag {
+		mrsNotReadyToMerge := []*gitlab.MergeRequest{}
+		for _, mr := range allMrs {
+			if mr.DetailedMergeStatus != "can_be_merged" {
+				mrsNotReadyToMerge = append(mrsNotReadyToMerge, mr)
+			}
+		}
+		allMrs = mrsNotReadyToMerge
 	}
 
 	return allMrs, nil

@@ -39,6 +39,7 @@ Run `macglab list` in a shell:
 - Use the `-i, --group-id` flag to override [the configured group ID](#group_id).
 - Use the `-m, --me` flag to override [the configured `me`](#me) user ID.
 - Use the `-p, --projects` flag to filter output to [the projects configuration](#projects).
+- Use the `-r, --ready` flag to filter output to include MRs that are ready to merge.
 - Use the `-t, --access-token` flag to override the configured access token.
 - Use the `-u, --users` flag to override [configured usernames](#usernames) and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
 
