@@ -189,10 +189,13 @@ func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, gro
 		allMrs = mrsNotApprovedByMe
 	}
 
+	// Filter out MRs that are ready to merge.
+	// See https://docs.gitlab.com/ee/api/merge_requests.html#merge-status for a list of statuses.
+	// [The `go-gitlab` maintainer believes adding enum support requires too much maintenance](https://github.com/xanzy/go-gitlab/pull/1774#issuecomment-1728723321).
 	if !readyFlag {
 		mrsNotReadyToMerge := []*gitlab.MergeRequest{}
 		for _, mr := range allMrs {
-			if mr.DetailedMergeStatus != "mergeable" { // See https://docs.gitlab.com/ee/api/merge_requests.html#merge-status for a list of statuses.
+			if mr.DetailedMergeStatus != "mergeable" {
 				mrsNotReadyToMerge = append(mrsNotReadyToMerge, mr)
 			}
 		}
