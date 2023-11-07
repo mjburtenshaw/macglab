@@ -3,84 +3,49 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/mjburtenshaw/macglab/config"
 	"github.com/mjburtenshaw/macglab/files"
+	"github.com/mjburtenshaw/macglab/flags"
 	"github.com/mjburtenshaw/macglab/glab"
 	"github.com/mjburtenshaw/macglab/mrs"
 	"github.com/spf13/cobra"
 	"github.com/xanzy/go-gitlab"
 )
 
-type ResolvedFlags struct {
-    accessToken                  string
-    groupId                      string
-    me                           int
-    flagUsernames                []string
-}
-
-type TrueUpFlags map[string]bool
-
-var (
-	approvedFlag     bool
-	browserFlag      bool
-	draftFlag        bool
-	groupFlag        bool
-	projectsFlag     bool
-	flagAccessToken  string
-	flagGroupId      string
-	flagMe           int
-	flagUsernamesRaw string
-)
-
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.PersistentFlags().BoolVarP(&approvedFlag, "approved", "a", false, "Filter output to include MRs approved by the configured me user ID.")
-	listCmd.PersistentFlags().BoolVarP(&browserFlag, "browser", "b", false, "Open merge requests in the browser.")
-	listCmd.PersistentFlags().BoolVarP(&draftFlag, "draft", "d", false, "Filter output to include draft merge requests.")
-	listCmd.PersistentFlags().BoolVarP(&groupFlag, "group", "g", false, "Filter output to the usernames configuration.")
-	listCmd.PersistentFlags().StringVarP(&flagGroupId, "group-id", "i", "", "Override the configured groud ID.")
-	listCmd.PersistentFlags().IntVarP(&flagMe, "me", "m", 0, "Override the configured me user ID.")
-	listCmd.PersistentFlags().BoolVarP(&projectsFlag, "projects", "p", false, "Filter output to the projects configuration.")
-	listCmd.PersistentFlags().StringVarP(&flagAccessToken, "access-token", "t", "", "Override the configured access token.")
-	listCmd.PersistentFlags().StringVarP(&flagUsernamesRaw, "users", "u", "", "Filter output to the specified usernames.")
+	flags.AddListFlags(listCmd)
 }
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List merge requests",
-	Long: `List merge requests using the following options:
-	- Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'me' user ID.
-	- Use the '-b, --browser' flag to open MRs in the browser.
-	- Use the '-d, --drafts' flag to include draft MRs.
-	- Use the '-g, --group' flag to filter output to the usernames configuration.
-	- Use the '-i, --group-id' flag to override the configured group ID.
-	- Use the '-m, --me' flag to override the configured me user ID.
-	- Use the '-p, --projects' flag to filter output to the projects configuration.
-	- Use the '-t, --access-token' flag to override the configured access token.
-	- Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`,
+	Long: flags.DescribeListFlags(),
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.Read(files.MacglabConfigUrl)
 		if err != nil {
-			log.Fatalf("Failed to read config: %v", err)
+			log.Printf("Failed to read config: %v", err)
+            return
 		}
 
-		resolvedFlags, trueUpFlags := resolveFlags(conf)
+		listFlags := flags.GetListFlags(conf)
 
-		glabClient, err := glab.Initialize(resolvedFlags.accessToken)
+		glabClient, err := glab.Initialize(listFlags.Resolved.AccessToken)
 		if err != nil {
-			log.Fatalf("Failed to initialize gitlab client: %v", err)
+			log.Printf("Failed to initialize gitlab client: %v", err)
+            return
 		}
 
-		allMrs, err := fetchMergeRequests(glabClient, conf, resolvedFlags.groupId, resolvedFlags.me, &draftFlag, &groupFlag, &projectsFlag, resolvedFlags.flagUsernames)
+		allMrs, err := fetchMergeRequests(glabClient, conf, listFlags.Resolved, listFlags.Boolean)
 		if err != nil {
-			log.Fatalf("Failed to fetch merge requests: %v", err)
+			log.Printf("Failed to fetch merge requests: %v", err)
+            return
 		}
 
 		mrs.PrintMergeRequests(allMrs)
 
-		if browserFlag {
+		if listFlags.Boolean.Browser {
 			if err := mrs.OpenMergeRequests(allMrs); err != nil {
 				log.Printf("Failed to open merge requests in the browser: %v", err)
 			}
@@ -88,80 +53,47 @@ var listCmd = &cobra.Command{
 
 		config.TrueUp([]config.TrueUpKit{
 			{
-				ShouldAsk:  trueUpFlags["shouldAskToUpdateAccessToken"],
+				ShouldAsk:  listFlags.TrueUp["shouldAskToUpdateAccessToken"],
 				Question:   "Do you want to use the same access token in the future? (yes/no): ",
 				ConfigAttr: "access_token",
-				NextValue:  flagAccessToken,
+				NextValue:  listFlags.RawValue.AccessToken,
 			},
 			{
-				ShouldAsk:  trueUpFlags["shouldAskToUpdateGroupId"],
+				ShouldAsk:  listFlags.TrueUp["shouldAskToUpdateGroupId"],
 				Question:   "Do you want to use the same group ID in the future? (yes/no): ",
 				ConfigAttr: "group_id",
-				NextValue:  flagGroupId,
+				NextValue:  listFlags.RawValue.GroupId,
 			},
 			{
-				ShouldAsk:  trueUpFlags["shouldAskToUpdateMe"],
+				ShouldAsk:  listFlags.TrueUp["shouldAskToUpdateMe"],
 				Question:   "Do you want to use the same me user ID in the future? (yes/no): ",
 				ConfigAttr: "me",
-				NextValue:  fmt.Sprintf("%d", flagMe),
+				NextValue:  fmt.Sprintf("%d", listFlags.RawValue.Me),
 			},
 		})
 	},
 }
 
-func resolveFlags(conf *config.Config) (resolvedFlags ResolvedFlags, trueUpFlags TrueUpFlags) {
-    resolvedFlags = ResolvedFlags{
-        accessToken: conf.AccessToken,
-        groupId:                      conf.GroupId,
-        me:                           conf.Me,
-        flagUsernames:                []string{},
-    }
-
-    trueUpFlags = make(TrueUpFlags)
-
-	if flagAccessToken != "" {
-		resolvedFlags.accessToken = flagAccessToken
-		trueUpFlags["shouldAskToUpdateAccessToken"] = true
-	}
-
-	if flagGroupId != "" {
-		resolvedFlags.groupId = flagGroupId
-		trueUpFlags["shouldAskToUpdateGroupId"] = true
-	}
-
-	if flagMe != 0 {
-		resolvedFlags.me = flagMe
-		trueUpFlags["shouldAskToUpdateMe"] = true
-	}
-
-	flagUsernamesRaw = strings.ReplaceAll(flagUsernamesRaw, " ", "")
-	if flagUsernamesRaw != "" {
-		resolvedFlags.flagUsernames = strings.Split(flagUsernamesRaw, ",")
-	}
-
-	return resolvedFlags, trueUpFlags
-}
-
-func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, groupId string, me int, draftFlag, groupFlag, projectsFlag *bool, flagUsernames []string) ([]*gitlab.MergeRequest, error) {
+func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, resolvedFlags flags.ResolvedFlags, booleanFlags flags.BooleanFlags) ([]*gitlab.MergeRequest, error) {
 	var allMrs []*gitlab.MergeRequest
 
-	if (!*groupFlag && !*projectsFlag) || *groupFlag {
-		usernames := chooseUsernames(flagUsernames, conf.Usernames)
-		groupMrs, err := mrs.FetchGroupMergeRequests(glabClient, groupId, usernames, draftFlag)
+	if (!booleanFlags.Group && !booleanFlags.Projects) || booleanFlags.Group {
+		usernames := chooseUsernames(resolvedFlags.Usernames, conf.Usernames)
+		groupMrs, err := mrs.FetchGroupMergeRequests(glabClient, resolvedFlags.GroupId, usernames, &booleanFlags.Draft)
 		if err != nil {
 			return nil, err
 		}
 		allMrs = append(allMrs, groupMrs...)
 	}
 
-	if (!*groupFlag && !*projectsFlag) || *projectsFlag {
+	if (!booleanFlags.Group && !booleanFlags.Projects) || booleanFlags.Projects {
 		allProjectUsernames := conf.Projects["all"]
 
 		for project, thisProjectUsernames := range conf.Projects {
 			if project != "all" {
 				projectUsernames := append(thisProjectUsernames, allProjectUsernames...)
-				usernames := chooseUsernames(flagUsernames, projectUsernames)
-				projectMrs, err := mrs.FetchProjectMergeRequests(glabClient, project, usernames, draftFlag)
+				usernames := chooseUsernames(resolvedFlags.Usernames, projectUsernames)
+				projectMrs, err := mrs.FetchProjectMergeRequests(glabClient, project, usernames, &booleanFlags.Draft)
 				if err != nil {
 					return nil, err
 				}
@@ -170,20 +102,33 @@ func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, gro
 		}
 	}
 
-    mrsInReviewByMe, err := mrs.FetchReviewerMergeRequests(glabClient, groupId, me, draftFlag)
-    if err != nil {
-        return nil, err
-    }
-    allMrs = append(allMrs, mrsInReviewByMe...)
+	mrsInReviewByMe, err := mrs.FetchReviewerMergeRequests(glabClient, resolvedFlags.GroupId, resolvedFlags.Me, &booleanFlags.Draft)
+	if err != nil {
+		return nil, err
+	}
+	allMrs = append(allMrs, mrsInReviewByMe...)
 
 	allMrs = dedupeMergeRequests(allMrs)
 
-	if !approvedFlag && me != 0 {
-		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(glabClient, groupId, me, allMrs)
+	if !booleanFlags.Approved && resolvedFlags.Me != 0 {
+		mrsNotApprovedByMe, err := excludeMrsApprovedByMe(glabClient, resolvedFlags.GroupId, resolvedFlags.Me, booleanFlags.Draft, allMrs)
 		if err != nil {
 			return nil, err
 		}
 		allMrs = mrsNotApprovedByMe
+	}
+
+	// Filter out MRs that are ready to merge.
+	// See https://docs.gitlab.com/ee/api/merge_requests.html#merge-status for a list of statuses.
+	// [The `go-gitlab` maintainer believes adding enum support requires too much maintenance](https://github.com/xanzy/go-gitlab/pull/1774#issuecomment-1728723321).
+	if !booleanFlags.Ready {
+		mrsNotReadyToMerge := []*gitlab.MergeRequest{}
+		for _, mr := range allMrs {
+			if mr.DetailedMergeStatus != "mergeable" {
+				mrsNotReadyToMerge = append(mrsNotReadyToMerge, mr)
+			}
+		}
+		allMrs = mrsNotReadyToMerge
 	}
 
 	return allMrs, nil
@@ -212,7 +157,7 @@ func dedupeMergeRequests(mergeRequests []*gitlab.MergeRequest) []*gitlab.MergeRe
 	return result
 }
 
-func excludeMrsApprovedByMe(glabClient *glab.TGitlabClient, groupId string, me int, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
+func excludeMrsApprovedByMe(glabClient *glab.TGitlabClient, groupId string, me int, draftFlag bool, allMrs []*gitlab.MergeRequest) ([]*gitlab.MergeRequest, error) {
 	approvedMrs, err := mrs.GetMergeRequestsApprovedByMe(glabClient, groupId, me, &draftFlag)
 	if err != nil {
 		return nil, err
