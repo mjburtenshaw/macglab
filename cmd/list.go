@@ -124,7 +124,7 @@ func fetchMergeRequests(glabClient *glab.TGitlabClient, conf *config.Config, res
 	if !booleanFlags.Ready {
 		mrsNotReadyToMerge := []*gitlab.MergeRequest{}
 		for _, mr := range allMrs {
-			if mr.DetailedMergeStatus != "mergeable" {
+			if mr.DetailedMergeStatus != "mergeable"  || mr.Author.ID == resolvedFlags.Me {
 				mrsNotReadyToMerge = append(mrsNotReadyToMerge, mr)
 			}
 		}
