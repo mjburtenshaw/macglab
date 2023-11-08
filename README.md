@@ -8,7 +8,7 @@ This program lists all GitLab Merge Requests (MRs) based on:
 - Specified usernames and/or projects
 - Specified group
 
-![Static Badge](https://img.shields.io/badge/version-4.2.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-4.2.1-66023c)
 
 Table of Contents
 ------------------
