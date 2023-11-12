@@ -61,7 +61,24 @@ Usage
 
 ### Commands
 
+- [`init`](#init)
 - [`list`](#list)
+
+#### `init`
+
+Initializes macglab by doing the following:
+
+1. Checks if there's a previous installation. Exits if so.
+2. Demands a home directory for this program on your machine.
+3. Adds required environment variables to your shell config file.
+4. Makes a new [config](#configuration) file.
+
+The config directory is created at `~/.macglab`.
+
+The config file is located at `~/.macglab/config.yml`
+
+We support the following shells:
+- zsh.
 
 #### `list`
 
