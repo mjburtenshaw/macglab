@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -20,6 +21,7 @@ var rootCmd = &cobra.Command{
         
         Complete documentation is available at https://github.com/mjburtenshaw/macglab`,
 	Run: func(cmd *cobra.Command, args []string) {
+		log.Println(AvailableCommands)
 	},
 }
 

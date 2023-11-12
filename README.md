@@ -61,12 +61,33 @@ Usage
 
 ### Commands
 
+- [`help`](#help)
 - [`init`](#init)
 - [`list`](#list)
 
+#### `help`
+
+Prints help about a given command or [a list of available commands](#commands) if none provided.
+
+```shell
+macglab help [OPTION]
+```
+
+##### Options
+
+- `help`
+- `init`
+- `list`
+
 #### `init`
 
-Initializes macglab by doing the following:
+Initializes macglab.
+
+```shell
+macglab init
+```
+
+`init` does the following:
 
 1. Checks if there's a previous installation. Exits if so.
 2. Demands a home directory for this program on your machine.
@@ -84,7 +105,7 @@ We support the following shells:
 
 Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
 
-```
+```shell
 macglab list [OPTIONS...]
 ```
 
