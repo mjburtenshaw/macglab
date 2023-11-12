@@ -12,7 +12,7 @@ var help = `macglab
 
 Automate gathering your work on gitlab.com to save time.
 
-v4.2.1
+v4.3.0
 
 Complete documentation is available at https://github.com/mjburtenshaw/macglab
 `
