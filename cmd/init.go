@@ -10,15 +10,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var help bool
+
 func init() {
 	rootCmd.AddCommand(initCmd)
+	initCmd.PersistentFlags().BoolVarP(&help, "help", "h", false, "Print the help for this command.")
 }
 
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initializes macglab",
-	Long:  `Initializes macglab`,
+	Long:  InitHelp,
 	Run: func(cmd *cobra.Command, args []string) {
+		if (help) {
+			log.Println(InitHelp)
+			return
+		}
+
 		log.Println("macglab: installing macglab...")
 
 		isNewInstall := false

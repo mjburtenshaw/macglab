@@ -101,6 +101,10 @@ The config file is located at `$HOME/.macglab/config.yml`
 We support the following shells:
 - zsh.
 
+##### Options
+
+- `-h, --help`: Print this section to the terminal.
+
 #### `list`
 
 Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
