@@ -33,7 +33,7 @@ Installation
 
 --------------------------------------------------------------------------------------------
 
-1. Clone this repository, move into it, install the binary, and run the install script:
+1. Clone this repository, move into it, install the binary, and run [the `init` command](#init):
 
 ```sh
 git clone https://github.com/mjburtenshaw/macglab.git
@@ -73,9 +73,9 @@ Initializes macglab by doing the following:
 3. Adds required environment variables to your shell config file.
 4. Makes a new [config](#configuration) file.
 
-The config directory is created at `~/.macglab`.
+The config directory is created at `$HOME/.macglab`.
 
-The config file is located at `~/.macglab/config.yml`
+The config file is located at `$HOME/.macglab/config.yml`
 
 We support the following shells:
 - zsh.
