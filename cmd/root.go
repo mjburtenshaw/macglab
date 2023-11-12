@@ -14,10 +14,6 @@ Automate gathering your work on gitlab.com to save time.
 
 v4.2.1
 
-Commands:
-- init: Initializes macglab.
-- list: Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
-
 Complete documentation is available at https://github.com/mjburtenshaw/macglab
 `
 
