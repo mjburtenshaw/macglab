@@ -15,7 +15,6 @@ Automate gathering your work on gitlab.com to save time.
 v4.2.1
 
 Commands:
-- help: Prints help about a given command or a list of available commands if none provided.
 - init: Initializes macglab.
 - list: Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
 
