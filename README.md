@@ -22,9 +22,8 @@ Table of Contents
     - [`access_token`](#access_token)
     - [`group_id`](#group_id)
     - [`me`](#me)
-    - [`usernames`](#usernames)
     - [`projects`](#projects)
-- [See Also](#see-also)
+    - [`usernames`](#usernames)
 
 Usage
 -----
@@ -92,11 +91,11 @@ See [the sample config](/config.sample.yml) for a full example.
 
 ### `access_token`
 
-A GitLab personal access token[^1].
+A [GitLab personal access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token).
 
 ### `group_id`
 
-A GitLab group ID[^2].
+A [GitLab group ID](https://docs.gitlab.com/ee/api/groups.html).
 
 ### `me`
 
@@ -104,13 +103,9 @@ Your GitLab user ID (though it doesn't *have* to be yours). It's used for the fo
 - Filter MRs based on approval.
 - Include MRs where the given user ID is a reviewer.
 
-### `usernames`
-
-A list of GitLab usernames in the group you wish to follow.
-
 ### `projects`
 
-A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
+A map of [GitLab project IDs](https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api) having a list associated usernames you wish to follow. For example:
 
 ```yaml
 projects:
@@ -129,9 +124,6 @@ projects:
         - username4
 ```
 
-See Also
----------
+### `usernames`
 
-[^1]: [GitLab personal access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
-[^2]: [GitLab groups](https://docs.gitlab.com/ee/api/groups.html)
-[^3]: [GitLab project IDs](https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api)
+A list of GitLab usernames in the group you wish to follow.
