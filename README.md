@@ -61,23 +61,8 @@ Usage
 
 ### Commands
 
-- [`help`](#help)
 - [`init`](#init)
 - [`list`](#list)
-
-#### `help`
-
-Prints help about a given command or [a list of available commands](#commands) if none provided.
-
-```shell
-macglab help [OPTION]
-```
-
-##### Options
-
-- `help`
-- `init`
-- `list`
 
 #### `init`
 
