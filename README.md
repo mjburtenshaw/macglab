@@ -3,51 +3,22 @@ macglab
 
 Automate gathering your work on gitlab.com to save time.
 
-This program lists all GitLab Merge Requests (MRs) based on:
-- Open state
-- Specified usernames and/or projects
-- Specified group
-
-![Static Badge](https://img.shields.io/badge/version-4.2.1-66023c)
+![Static Badge](https://img.shields.io/badge/version-4.3.0-66023c)
 
 Table of Contents
 ------------------
 
-- [Usage](#usage)
-    - [List](#list)
 - [Installation](#installation)
     - [Requirements](#requirements)
     - [Updating](#updating)
+- [Usage](#usage)
+    - [Commands](#commands)
 - [Configuration](#configuration)
     - [`access_token`](#access_token)
     - [`group_id`](#group_id)
     - [`me`](#me)
-    - [`usernames`](#usernames)
     - [`projects`](#projects)
-- [See Also](#see-also)
-
-Usage
------
-
-### List
-
-Run `macglab list` in a shell:
-- Use the `-a, --approved` flag to filter output to include MRs approved by [the configured `me`](#me) user ID.
-- Use the `-b, --browser` flag to open MRs in the browser.
-- Use the `-d, --drafts` flag to include draft MRs.
-- Use the `-g, --group` flag to filter output to [the usernames configuration](#usernames).
-- Use the `-i, --group-id` flag to override [the configured group ID](#group_id).
-- Use the `-m, --me` flag to override [the configured `me`](#me) user ID.
-- Use the `-p, --projects` flag to filter output to [the projects configuration](#projects).
-- Use the `-r, --ready` flag to filter output to include MRs that are ready to merge.
-- Use the `-t, --access-token` flag to override the configured access token.
-- Use the `-u, --users` flag to override [configured usernames](#usernames) and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
-
-```sh
-macglab list --users=harry,hermoine,ron
-```
-
-> 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
+    - [`usernames`](#usernames)
 
 Installation
 -------------
@@ -62,7 +33,7 @@ Installation
 
 --------------------------------------------------------------------------------------------
 
-1. Clone this repository, move into it, install the binary, and run the install script:
+1. Clone this repository, move into it, install the binary, and run [the `init` command](#init):
 
 ```sh
 git clone https://github.com/mjburtenshaw/macglab.git
@@ -85,6 +56,76 @@ git pull
 go install
 ```
 
+Usage
+-----
+
+### Commands
+
+- [`init`](#init)
+- [`list`](#list)
+
+#### `init`
+
+Initializes macglab.
+
+```shell
+macglab init
+```
+
+`init` does the following:
+
+1. Checks if there's a previous installation. Exits if so.
+2. Demands a home directory for this program on your machine.
+3. Adds required environment variables to your shell config file.
+4. Makes a new [config](#configuration) file.
+
+The config directory is created at `$HOME/.macglab`.
+
+The config file is located at `$HOME/.macglab/config.yml`
+
+We support the following shells:
+- zsh.
+
+##### Options
+
+- `-h, --help`: Print this section to the terminal.
+
+#### `list`
+
+Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
+
+```shell
+macglab list [OPTIONS...]
+```
+
+`list` fetches MRs meeting ALL the following criteria:
+- State is open.
+- Belongs to [the configured group ID](#group_id).
+- Is NOT a draft.
+- Meets ANY of the following criteria:
+    - The author is listed in [the configured usernames](#usernames).
+    - The author is listed in ANY of [the configured projects](#projects); but it only returns MRs for projects the author is listed under.
+    - [You](#me) are listed as a [reviewer](https://docs.gitlab.com/ee/user/project/merge_requests/reviews/#request-a-review).
+
+`list` then excludes MRs meeting the following criteria:
+- Approved by [you](#me).
+- Mergeable MRs where [you](#me) are NOT the author.
+
+##### Options
+
+- `-a, --approved`: Include MRs [you](#me) approved.
+- `-b, --browser`: Open MRs in the browser.
+- `-d, --draft`: Include draft MRs.
+- `-g, --group`: ONLY include MRs where the author is listed in the provided users (*see `-u, --users`*) or [the configured usernames](#usernames).
+- `-i <string>, --group-id=<string>`: Override [the configured group ID](#group_id) with the given string.
+- `-m <number>, --me <number>`: Override [the configured `me`](#me) user ID with the given number.
+- `-p, --projects`: ONLY include MRs where the author is listed in ANY of [the configured projects](#projects); but it only returns MRs for projects the author is listed under.
+- `-r, --ready`: Include mergeable MRs.
+- `-t <string>, --access-token <string>`: Override [the configured access token](#access_token).
+- `-u <string>, --users=<string>`: Override [configured usernames](#usernames) and ONLY filter on usernames you provided. Accepts a CSV of usernames.
+
+> 👯‍♀️ **Note:** `group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.
+
 Configuration
 --------------
 
@@ -92,11 +133,11 @@ See [the sample config](/config.sample.yml) for a full example.
 
 ### `access_token`
 
-A GitLab personal access token[^1].
+A [GitLab personal access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token).
 
 ### `group_id`
 
-A GitLab group ID[^2].
+A [GitLab group ID](https://docs.gitlab.com/ee/api/groups.html).
 
 ### `me`
 
@@ -104,39 +145,27 @@ Your GitLab user ID (though it doesn't *have* to be yours). It's used for the fo
 - Filter MRs based on approval.
 - Include MRs where the given user ID is a reviewer.
 
-### `usernames`
-
-A list of GitLab usernames in the group you wish to follow.
-
 ### `projects`
 
-A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
+A map of [GitLab project IDs](https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api) having a list associated usernames you wish to follow. For example:
 
 ```yaml
-# usernames listed under the "all" entry will apply to every project listed below.
-
 projects:
-    all:
+    all: # usernames listed under the "all" entry will apply to every project.
         - username1
-    123:
-        # projectA
+    123: # projectA
         - username2
         - username3
-    456:
-        # projectB
+    456: # projectB
         - username3
         - username4
-    789:
-        # projectC
+    789: # projectC
         # if left blank, this will inherit from `all`.
     101112:
         # projectD
         - username4
 ```
 
-See Also
----------
+### `usernames`
 
-[^1]: [GitLab personal access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
-[^2]: [GitLab groups](https://docs.gitlab.com/ee/api/groups.html)
-[^3]: [GitLab project IDs](https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api)
+A list of GitLab usernames in the group you wish to follow.

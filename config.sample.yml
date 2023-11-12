@@ -1,27 +1,20 @@
+# See [macglab > Configuration](https://github.com/mjburtenshaw/macglab#configuration) for this file's specification.
+
 access_token: <your_access_token_here>
-
 group_id: <your_group_id_here>
-
 me: <your_gitlab_user_id_here>
-
-# usernames listed under the "all" entry will apply to every project listed below.
 projects:
-    all:
+    all: # usernames listed under the "all" entry will apply to every project.
         - username1
-    123:
-        # projectA
+    123: # projectA
         - username2
         - username3
-    456:
-        # projectB
+    456: # projectB
         - username3
         - username4
-    789:
-        # projectC
+    789: # projectC
         # if left blank, this will inherit from `all`.
-    101112:
-        # projectD
+    101112: # projectD
         - username4
-
 usernames:
   - <a_list_of_usernames_here>

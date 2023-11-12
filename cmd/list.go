@@ -21,7 +21,24 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List merge requests",
-	Long: flags.DescribeListFlags(),
+	Long: `list
+
+Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
+
+list fetches MRs meeting ALL the following criteria:
+- State is open.
+- Belongs to the configured group ID.
+- Is NOT a draft.
+- Meets ANY of the following criteria:
+	- The author is listed in the configured usernames.
+	- The author is listed in ANY of the configured projects; but it only returns MRs for projects the author is listed under.
+	- You are listed as a reviewer.
+
+list then excludes MRs meeting the following criteria:
+- Approved by you.
+- Mergeable MRs where you are NOT the author.
+
+Note: group and projects are not mutually exclusive. If neither are provided, the program will run as if both are provided.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.Read(files.MacglabConfigUrl)
 		if err != nil {

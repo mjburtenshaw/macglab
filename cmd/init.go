@@ -17,7 +17,23 @@ func init() {
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initializes macglab",
-	Long:  `Initializes macglab`,
+	Long:  `init
+
+Initializes macglab.
+
+init does the following:
+
+1. Checks if there's a previous installation. Exits if so.
+2. Demands a home directory for this program on your machine.
+3. Adds required environment variables to your shell config file.
+4. Makes a new config file.
+
+The config directory is created at ~/.macglab.
+
+The config file is located at ~/.macglab/config.yml
+
+We support the following shells:
+- zsh.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("macglab: installing macglab...")
 
