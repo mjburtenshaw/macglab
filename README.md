@@ -113,21 +113,16 @@ A list of GitLab usernames in the group you wish to follow.
 A map of GitLab project IDs[^3] having a list associated usernames you wish to follow. For example:
 
 ```yaml
-# usernames listed under the "all" entry will apply to every project listed below.
-
 projects:
-    all:
+    all: # usernames listed under the "all" entry will apply to every project.
         - username1
-    123:
-        # projectA
+    123: # projectA
         - username2
         - username3
-    456:
-        # projectB
+    456: # projectB
         - username3
         - username4
-    789:
-        # projectC
+    789: # projectC
         # if left blank, this will inherit from `all`.
     101112:
         # projectD

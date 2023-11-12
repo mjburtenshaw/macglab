@@ -28,7 +28,7 @@ type TrueUpKit struct {
 
 func Read(configUrl string) (*Config, error) {
 	if err := files.CheckFileExists(configUrl); err != nil {
-		return nil, fmt.Errorf("couldn't find %s: %w", configUrl, err)
+		return nil, fmt.Errorf("couldn't find %s.\n\nPlease run `macglab init`.\n\n%w", configUrl, err)
 	}
 
 	configFile, err := os.ReadFile(configUrl)
@@ -38,7 +38,7 @@ func Read(configUrl string) (*Config, error) {
 
 	var config *Config
 	if err = yaml.Unmarshal(configFile, &config); err != nil {
-		return nil, fmt.Errorf("couldn't unmarshal %s: %w", configUrl, err)
+		return nil, fmt.Errorf("couldn't unmarshal %s.\n\nPlease check for syntax errors in %s.\n\n: %w", configUrl, configUrl, err)
 	}
 
 	return config, nil
