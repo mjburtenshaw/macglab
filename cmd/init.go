@@ -10,23 +10,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var help bool
-
 func init() {
 	rootCmd.AddCommand(initCmd)
-	initCmd.PersistentFlags().BoolVarP(&help, "help", "h", false, "Print the help for this command.")
 }
 
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initializes macglab",
-	Long:  InitHelp,
-	Run: func(cmd *cobra.Command, args []string) {
-		if (help) {
-			log.Println(InitHelp)
-			return
-		}
+	Long:  `init
 
+	Initializes macglab.
+	
+	init does the following:
+	
+	1. Checks if there's a previous installation. Exits if so.
+	2. Demands a home directory for this program on your machine.
+	3. Adds required environment variables to your shell config file.
+	4. Makes a new config file.
+	
+	The config directory is created at ~/.macglab.
+	
+	The config file is located at ~/.macglab/config.yml
+	
+	We support the following shells:
+	- zsh.`,
+	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("macglab: installing macglab...")
 
 		isNewInstall := false

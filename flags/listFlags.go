@@ -57,30 +57,16 @@ var valueFlags = RawValueFlags{
 
 func AddListFlags(listCmd *cobra.Command) {
 	listFlags := listCmd.PersistentFlags()
-	listFlags.BoolVarP(&booleanFlags.Approved, "approved", "a", false, "Filter output to include MRs approved by the configured me user ID.")
-	listFlags.BoolVarP(&booleanFlags.Browser, "browser", "b", false, "Open merge requests in the browser.")
-	listFlags.BoolVarP(&booleanFlags.Draft, "draft", "d", false, "Filter output to include draft merge requests.")
-	listFlags.BoolVarP(&booleanFlags.Group, "group", "g", false, "Filter output to the usernames configuration.")
-	listFlags.BoolVarP(&booleanFlags.Projects, "projects", "p", false, "Filter output to the projects configuration.")
-	listFlags.BoolVarP(&booleanFlags.Ready, "ready", "r", false, "Filter output to include merge requests that are ready to merge.")
+	listFlags.BoolVarP(&booleanFlags.Approved, "approved", "a", false, "Include MRs you approved.")
+	listFlags.BoolVarP(&booleanFlags.Browser, "browser", "b", false, "Open MRs in the browser.")
+	listFlags.BoolVarP(&booleanFlags.Draft, "draft", "d", false, "Include draft MRs.")
+	listFlags.BoolVarP(&booleanFlags.Group, "group", "g", false, "ONLY include MRs where the author is listed in the provided users (*see -u, --users*) or the configured usernames.")
+	listFlags.BoolVarP(&booleanFlags.Projects, "projects", "p", false, "ONLY include MRs where the author is listed in ANY of the configured projects; but it only returns MRs for projects the author is listed under.")
+	listFlags.BoolVarP(&booleanFlags.Ready, "ready", "r", false, "Include mergeable MRs.")
 	listFlags.StringVarP(&valueFlags.GroupId, "group-id", "i", "", "Override the configured groud ID.")
-	listFlags.IntVarP(&valueFlags.Me, "me", "m", 0, "Override the configured me user ID.")
+	listFlags.IntVarP(&valueFlags.Me, "me", "m", 0, "Override the configured me user ID with the given number.")
 	listFlags.StringVarP(&valueFlags.AccessToken, "access-token", "t", "", "Override the configured access token.")
-	listFlags.StringVarP(&valueFlags.UsernamesRaw, "users", "u", "", "Filter output to the specified usernames.")
-}
-
-func DescribeListFlags() string {
-	return `List merge requests using the following options:
-    - Use the '-a, --approved' flag to filter output to include MRs approved by the configured 'me' user ID.
-    - Use the '-b, --browser' flag to open MRs in the browser.
-    - Use the '-d, --drafts' flag to include draft MRs.
-    - Use the '-g, --group' flag to filter output to the usernames configuration.
-    - Use the '-i, --group-id' flag to override the configured group ID.
-    - Use the '-m, --me' flag to override the configured me user ID.
-    - Use the '-p, --projects' flag to filter output to the projects configuration.
-    - Use the '-r, --ready' flag to filter output to include merge requests that are ready to merge.
-    - Use the '-t, --access-token' flag to override the configured access token.
-    - Use the '-u, --users' flag to override configured usernames and only filter on usernames you provided. Accepts a CSV string of usernames.`
+	listFlags.StringVarP(&valueFlags.UsernamesRaw, "users", "u", "", "Override configured usernames and ONLY filter on usernames you provided. Accepts a CSV of usernames.")
 }
 
 func GetListFlags(conf *config.Config) (listFlags ListFlags) {

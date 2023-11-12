@@ -8,20 +8,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var help = `macglab
+
+Automate gathering your work on gitlab.com to save time.
+
+v4.2.1
+
+Commands:
+- help: Prints help about a given command or a list of available commands if none provided.
+- init: Initializes macglab.
+- list: Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
+
+Complete documentation is available at https://github.com/mjburtenshaw/macglab
+`
+
 var rootCmd = &cobra.Command{
 	Use:   "macglab",
 	Short: "macglab automates gathering your work on gitlab.com to save time.",
-	Long: `macglab automates gathering your work on gitlab.com to save time.
-
-        This program lists all GitLab Merge Requests (MRs) based on:
-        
-        - Open state
-        - Specified usernames and/or projects
-        - Specified group
-        
-        Complete documentation is available at https://github.com/mjburtenshaw/macglab`,
+	Long: help,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println(AvailableCommands)
+		log.Println(help)
 	},
 }
 
