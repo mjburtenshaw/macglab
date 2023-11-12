@@ -92,6 +92,7 @@ macglab list [OPTIONS...]
 - `-g, --group`: ONLY include MRs where the author is listed in the provided users (*see `-u, --users`*) or [the configured usernames](#usernames).
 - `-i <string>, --group-id=<string>`: Override [the configured group ID](#group_id) with the given string.
 - `-m <number>, --me <number>`: Override [the configured `me`](#me) user ID with the given number.
+- `-p, --projects`: ONLY include MRs where the author is listed in ANY of [the configured projects](#projects); but it only returns MRs for projects the author is listed under.
 - `-r, --ready`: Include mergeable MRs.
 - `-t <string>, --access-token <string>`: Override [the configured access token](#access_token).
 - `-u <string>, --users=<string>`: Override [configured usernames](#usernames) and ONLY filter on usernames you provided. Accepts a CSV of usernames.
