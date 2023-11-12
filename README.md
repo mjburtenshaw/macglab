@@ -3,50 +3,22 @@ macglab
 
 Automate gathering your work on gitlab.com to save time.
 
-This program lists all GitLab Merge Requests (MRs) based on:
-- Open state
-- Specified usernames and/or projects
-- Specified group
-
 ![Static Badge](https://img.shields.io/badge/version-4.2.1-66023c)
 
 Table of Contents
 ------------------
 
-- [Usage](#usage)
-    - [List](#list)
 - [Installation](#installation)
     - [Requirements](#requirements)
     - [Updating](#updating)
+- [Usage](#usage)
+    - [Commands](#commands)
 - [Configuration](#configuration)
     - [`access_token`](#access_token)
     - [`group_id`](#group_id)
     - [`me`](#me)
     - [`projects`](#projects)
     - [`usernames`](#usernames)
-
-Usage
------
-
-### List
-
-Run `macglab list` in a shell:
-- Use the `-a, --approved` flag to filter output to include MRs approved by [the configured `me`](#me) user ID.
-- Use the `-b, --browser` flag to open MRs in the browser.
-- Use the `-d, --drafts` flag to include draft MRs.
-- Use the `-g, --group` flag to filter output to [the usernames configuration](#usernames).
-- Use the `-i, --group-id` flag to override [the configured group ID](#group_id).
-- Use the `-m, --me` flag to override [the configured `me`](#me) user ID.
-- Use the `-p, --projects` flag to filter output to [the projects configuration](#projects).
-- Use the `-r, --ready` flag to filter output to include MRs that are ready to merge.
-- Use the `-t, --access-token` flag to override the configured access token.
-- Use the `-u, --users` flag to override [configured usernames](#usernames) and only filter on usernames you provided. Accepts a CSV string of usernames. For example:
-
-```sh
-macglab list --users=harry,hermoine,ron
-```
-
-> 👯‍♀️ *`group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.*
 
 Installation
 -------------
@@ -83,6 +55,48 @@ git checkout main
 git pull
 go install
 ```
+
+Usage
+-----
+
+### Commands
+
+- [`list`](#list)
+
+#### `list`
+
+Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
+
+```
+macglab list [OPTIONS...]
+```
+
+`list` fetches MRs meeting ALL the following criteria:
+- State is open.
+- Belongs to [the configured group ID](#group_id).
+- Is NOT a draft.
+- Meets ANY of the following criteria:
+    - The author is listed in [the configured usernames](#usernames).
+    - The author is listed in ANY of [the configured projects](#projects); but it only returns MRs for projects the author is listed under.
+    - [You](#me) are listed as a [reviewer](https://docs.gitlab.com/ee/user/project/merge_requests/reviews/#request-a-review).
+
+`list` then excludes MRs meeting the following criteria:
+- Approved by [you](#me).
+- Mergeable MRs where [you](#me) are NOT the author.
+
+##### Options
+
+- `-a, --approved`: Include MRs [you](#me) approved.
+- `-b, --browser`: Open MRs in the browser.
+- `-d, --drafts`: Include draft MRs.
+- `-g, --group`: ONLY include MRs where the author is listed in the provided users (*see `-u, --users`*) or [the configured usernames](#usernames).
+- `-i <string>, --group-id=<string>`: Override [the configured group ID](#group_id) with the given string.
+- `-m <number>, --me <number>`: Override [the configured `me`](#me) user ID with the given number.
+- `-r, --ready`: Include mergeable MRs.
+- `-t <string>, --access-token <string>`: Override [the configured access token](#access_token).
+- `-u <string>, --users=<string>`: Override [configured usernames](#usernames) and ONLY filter on usernames you provided. Accepts a CSV of usernames.
+
+> 👯‍♀️ **Note:** `group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.
 
 Configuration
 --------------
