@@ -120,6 +120,7 @@ macglab list [OPTIONS...]
 
 - `-a, --approved`: Include MRs [you](#me) approved.
 - `-b, --browser`: Open MRs in the browser.
+- `-c, --count`: Print the result count to the terminal.
 - `-d, --draft`: Include draft MRs.
 - `-g, --group`: ONLY include MRs where the author is listed in the provided users (*see `-u, --users`*) or [the configured usernames](#usernames).
 - `-i <string>, --group-id=<string>`: Override [the configured group ID](#group_id) with the given string.
