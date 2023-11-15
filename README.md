@@ -5,24 +5,24 @@ Automate gathering your work on gitlab.com to save time.
 
 ![Static Badge](https://img.shields.io/badge/version-4.4.0-66023c)
 
-Table of Contents
-------------------
+📖 Table of Contents
+---------------------
 
-- [Installation](#installation)
+- [Installation](#🏗️-installation)
     - [Requirements](#requirements)
     - [Updating](#updating)
-- [Usage](#usage)
+- [Usage](#💻-usage)
     - [Commands](#commands)
     - [Flags](#flags)
-- [Configuration](#configuration)
+- [Configuration](#📜-configuration)
     - [`access_token`](#access_token)
     - [`group_id`](#group_id)
     - [`me`](#me)
     - [`projects`](#projects)
     - [`usernames`](#usernames)
 
-Installation
--------------
+🏗️ Installation
+---------------
 
 ### Requirements
 
@@ -57,8 +57,8 @@ git pull
 go install
 ```
 
-Usage
------
+💻 Usage
+--------
 
 ### Commands
 
@@ -131,8 +131,8 @@ macglab list [OPTIONS...]
 
 > 👯‍♀️ **Note:** `group` and `projects` are not mutually exclusive. If neither are provided, the program will run as if both are provided.
 
-Configuration
---------------
+📜 Configuration
+----------------
 
 See [the sample config](/config.sample.yml) for a full example.
 
