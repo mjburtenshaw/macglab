@@ -18,7 +18,7 @@ Complete documentation is available at https://github.com/mjburtenshaw/macglab
 `
 
 var rootCmd = &cobra.Command{
-	Version: "4.5.0",
+	Version: "4.5.1",
 	Use:   "macglab",
 	Short: "macglab automates gathering your work on gitlab.com to save time.",
 	Long: help,
