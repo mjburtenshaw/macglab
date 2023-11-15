@@ -48,7 +48,7 @@ We support the following shells:
 			}
 
 			log.Println("macglab: adding environment variables...")
-			if err := env.Update(files.ShConfigUrl); err != nil {
+			if err := env.Update(files.ShConfigUrl, files.MacglabZshConfigUrl); err != nil {
 				log.Fatalf("macglab: couldn't add environment variables: %s", err)
 			}
 		}
