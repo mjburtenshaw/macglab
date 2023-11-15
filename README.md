@@ -3,7 +3,7 @@ macglab
 
 Automate gathering your work on gitlab.com to save time.
 
-![Static Badge](https://img.shields.io/badge/version-4.3.0-66023c)
+![Static Badge](https://img.shields.io/badge/version-4.4.0-66023c)
 
 Table of Contents
 ------------------
@@ -64,6 +64,14 @@ Usage
 - [`init`](#init)
 - [`list`](#list)
 
+### Flags
+
+These flags apply to the main command, `macglab`:
+- `-v, --version`: Print the version to the terminal.
+
+These flags apply to every command:
+- `-h, --help`: Print help the terminal.
+
 #### `init`
 
 Initializes macglab.
@@ -86,10 +94,6 @@ The config file is located at `$HOME/.macglab/config.yml`
 We support the following shells:
 - zsh.
 
-##### Options
-
-- `-h, --help`: Print this section to the terminal.
-
 #### `list`
 
 Prints GitLab Merge Request (MRs) authors and URLs to the terminal.
@@ -111,7 +115,7 @@ macglab list [OPTIONS...]
 - Approved by [you](#me).
 - Mergeable MRs where [you](#me) are NOT the author.
 
-##### Options
+##### Flags
 
 - `-a, --approved`: Include MRs [you](#me) approved.
 - `-b, --browser`: Open MRs in the browser.
