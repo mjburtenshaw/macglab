@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	macglabZshContent = `
-# [macglab](https://github.com/mjburtenshaw/macglab)
+	macglabZshContent = `# [macglab](https://github.com/mjburtenshaw/macglab)
 
 export MACGLAB="${HOME}/.macglab"
 export PATH="${GOPATH}/bin/macglab:${PATH}"
+
 `
 	shContent  = "source ${HOME}/.macglab/macglab.zsh"
 	createMode = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
