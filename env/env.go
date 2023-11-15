@@ -9,59 +9,70 @@ import (
 	"github.com/mjburtenshaw/macglab/files"
 )
 
-func Update(shConfigUrl string) (err error) { 
-    if didUpdateEnv, err := check(shConfigUrl); err != nil {
-        return fmt.Errorf("couldn't check %s for environment variables: %w", shConfigUrl, err)
-    } else if didUpdateEnv {
-        return nil  // We already did the stuff below. Exit early.
-    }
+const (
+	macglabZshContent = `# [macglab](https://github.com/mjburtenshaw/macglab)
 
-    shConfig, err := os.OpenFile(shConfigUrl, os.O_WRONLY|os.O_APPEND, 0644)
-    if err != nil {
-        return fmt.Errorf("couldn't open %s: %w", shConfigUrl, err)
-    }
-    defer func() {
-        if cerr := shConfig.Close(); cerr != nil && err == nil {
-            err = cerr
-        }
-    }()
+export MACGLAB="${HOME}/.macglab"
+export PATH="${GOPATH}/bin/macglab:${PATH}"
 
-    envVariables := `
-    # [macglab](https://github.com/mjburtenshaw/macglab)
+`
+	shContent  = "source ${HOME}/.macglab/macglab.zsh"
+	createMode = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	appendMode = os.O_WRONLY | os.O_APPEND
+)
 
-    export MACGLAB="${HOME}/.macglab"
-    export PATH="${GOPATH}/bin/macglab:${PATH}"
-    `
-    if _, err := shConfig.WriteString(envVariables); err != nil {
-        return fmt.Errorf("couldn't write to %s: %w", shConfigUrl, err)
-    }
+// Checks if we've already installed environment variables.
+// If not, it will create a file we manage to define environment variables.
+// Then, we'll update the shell config file to source the first one.
+// This way, if we need to push updates in the future, we can do so without
+// reaching into the main shell config file, and not introduce a breaking change.
+func Update(shConfigUrl string, macglabZshConfigUrl string) (err error) {
+	if didUpdateEnv, err := check(shConfigUrl); err != nil {
+		return fmt.Errorf("couldn't check %s for environment variables: %w", shConfigUrl, err)
+	} else if didUpdateEnv {
+		return nil // We already did the stuff below. Exit early.
+	}
 
-    return nil
+	if err := writeFile(macglabZshConfigUrl, createMode, macglabZshContent); err != nil {
+		return err
+	}
+
+	return writeFile(shConfigUrl, appendMode, shContent)
+}
+
+func writeFile(fileUrl string, flag int, content string) error {
+	file, err := os.OpenFile(fileUrl, flag, 0644)
+	if err != nil {
+		return fmt.Errorf("couldn't open or create %s: %w", fileUrl, err)
+	}
+	defer file.Close()
+
+	if _, err = file.WriteString(content); err != nil {
+		return fmt.Errorf("couldn't write to %s: %w", fileUrl, err)
+	}
+
+	return nil
 }
 
 func check(shConfigUrl string) (didUpdateEnv bool, err error) {
-    if err := files.CheckFileExists(shConfigUrl); err != nil {
-        return false, fmt.Errorf("couldn't find %s: %w", shConfigUrl, err)
-    }
+	if err := files.CheckFileExists(shConfigUrl); err != nil {
+		return false, fmt.Errorf("couldn't find %s: %w", shConfigUrl, err)
+	}
 
-    shConfig, err := os.Open(shConfigUrl)
-    if err != nil {
-        return false, fmt.Errorf("couldn't open %s: %w", shConfigUrl, err)
-    }
-    defer func() {
-        if cerr := shConfig.Close(); cerr != nil && err == nil {
-            err = cerr
-        }
-    }()
+	shConfig, err := os.Open(shConfigUrl)
+	if err != nil {
+		return false, fmt.Errorf("couldn't open %s: %w", shConfigUrl, err)
+	}
+	defer func() {
+		if cerr := shConfig.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
-    contents, err := io.ReadAll(shConfig)
-    if err != nil {
-        return false, fmt.Errorf("couldn't read %s: %w", shConfigUrl, err)
-    }
+	contents, err := io.ReadAll(shConfig)
+	if err != nil {
+		return false, fmt.Errorf("couldn't read %s: %w", shConfigUrl, err)
+	}
 
-    if strings.Contains(string(contents), "macglab") {
-        return true, nil
-    }
-
-    return false, nil
+	return strings.Contains(string(contents), "macglab"), nil
 }

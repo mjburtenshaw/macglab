@@ -10,6 +10,7 @@ var (
 	HomeUri          string
 	MacglabConfigUrl string
 	MacglabUri       string
+	MacglabZshConfigUrl string
 	ShConfigUrl      string
 	SampleConfigUrl  = "config.sample.yml"
 )
@@ -28,6 +29,7 @@ func init() {
 	ShConfigUrl = fmt.Sprintf("%s/.zshrc", HomeUri)
 	MacglabUri = fmt.Sprintf("%s/.macglab", HomeUri)
 	MacglabConfigUrl = fmt.Sprintf("%s/config.yml", MacglabUri)
+	MacglabZshConfigUrl = fmt.Sprintf("%s/macglab.zsh", MacglabUri)
 }
 
 func CheckFileExists(fileUrl string) error {
