@@ -13,6 +13,7 @@ Table of Contents
     - [Updating](#updating)
 - [Usage](#usage)
     - [Commands](#commands)
+    - [Flags](#flags)
 - [Configuration](#configuration)
     - [`access_token`](#access_token)
     - [`group_id`](#group_id)
