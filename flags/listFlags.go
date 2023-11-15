@@ -10,6 +10,7 @@ import (
 type BooleanFlags struct {
 	Approved bool
 	Browser  bool
+	Count	 bool
 	Draft    bool
 	Group    bool
 	Projects bool
@@ -42,6 +43,7 @@ type ListFlags struct {
 var booleanFlags = BooleanFlags{
 	Approved: false,
 	Browser:  false,
+	Count:    false,
 	Draft:    false,
 	Group:    false,
 	Projects: false,
@@ -59,6 +61,7 @@ func AddListFlags(listCmd *cobra.Command) {
 	listFlags := listCmd.PersistentFlags()
 	listFlags.BoolVarP(&booleanFlags.Approved, "approved", "a", false, "Include MRs you approved.")
 	listFlags.BoolVarP(&booleanFlags.Browser, "browser", "b", false, "Open MRs in the browser.")
+	listFlags.BoolVarP(&booleanFlags.Count, "count", "c", false, "Print the result count to the terminal.")
 	listFlags.BoolVarP(&booleanFlags.Draft, "draft", "d", false, "Include draft MRs.")
 	listFlags.BoolVarP(&booleanFlags.Group, "group", "g", false, "ONLY include MRs where the author is listed in the provided users (*see -u, --users*) or the configured usernames.")
 	listFlags.BoolVarP(&booleanFlags.Projects, "projects", "p", false, "ONLY include MRs where the author is listed in ANY of the configured projects; but it only returns MRs for projects the author is listed under.")

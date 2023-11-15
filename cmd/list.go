@@ -60,6 +60,10 @@ Note: group and projects are not mutually exclusive. If neither are provided, th
             return
 		}
 
+		if listFlags.Boolean.Count {
+			fmt.Printf("count: %v\n", len(allMrs))
+		}
+
 		mrs.PrintMergeRequests(allMrs)
 
 		if listFlags.Boolean.Browser {
