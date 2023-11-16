@@ -188,7 +188,7 @@ func excludeMrsApprovedByMe(glabClient *glab.TGitlabClient, groupId string, me i
 	for _, mr := range allMrs {
 		isApproved := false
 		for _, approvedMr := range approvedMrs {
-			if mr.IID == approvedMr.IID {
+			if mr.ID == approvedMr.ID {
 				isApproved = true
 				break
 			}
